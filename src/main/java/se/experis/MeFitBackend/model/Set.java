@@ -18,6 +18,31 @@ public class Set {
     private int repetitions;
 
     @OneToOne
-    @JoinColumn
+    @JoinColumn(name = "exerciseFk")
     private Exercise exerciseFk;
+
+    @OneToOne
+    @JoinColumn(name = "workoutFk")
+    private Workout workoutFk;
+
+    public Set() {
+    }
+
+    public Set(int repetitions, Exercise exerciseFk, Workout workoutFk) {
+        this.repetitions = repetitions;
+        this.exerciseFk = exerciseFk;
+        this.workoutFk = workoutFk;
+    }
+
+    public int getRepetitions() {
+        return repetitions;
+    }
+
+    public Exercise getExerciseFk() {
+        return exerciseFk;
+    }
+
+    public Workout getWorkoutFk() {
+        return workoutFk;
+    }
 }

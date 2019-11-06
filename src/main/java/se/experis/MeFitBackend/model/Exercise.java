@@ -33,7 +33,7 @@ public class Exercise {
     public String videoLink;
 
     @OneToOne
-    @JoinColumn
+    @JoinColumn(name = "exercise_fk")
     private Set setFk;
 
     public Exercise() {

@@ -1,6 +1,8 @@
 package se.experis.MeFitBackend.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author : Zacky Kharboutli
@@ -27,6 +29,10 @@ public class Address {
 
     @Column
     private int postalCode;
+
+    @OneToMany
+    @JoinColumn(name="address_fk")
+    private List<Profile> profileFk = new ArrayList<Profile>();
 
     public Address() {
     }
