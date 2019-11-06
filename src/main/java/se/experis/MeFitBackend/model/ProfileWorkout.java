@@ -20,7 +20,7 @@ public class ProfileWorkout {
     private Profile profileFk;
 
     @OneToOne
-    @JoinColumn(name = "workoutFk")
+    @JoinColumn(name = "workout_fk")
     private Workout workoutFk;
 
     public ProfileWorkout(Profile profileFk, Workout workoutFk) {

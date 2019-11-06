@@ -32,10 +32,6 @@ public class Exercise {
     @Column
     public String videoLink;
 
-    @OneToOne
-    @JoinColumn(name = "exercise_fk")
-    private Set setFk;
-
     public Exercise() {
     }
 

@@ -32,11 +32,6 @@ public class EndUser {
     @Column(unique=true)
     public String email;
 
-    @OneToOne
-    @JoinColumn(name="end_user_fk")
-    private Profile profileFk;
-
-
     public EndUser() {
     }
 

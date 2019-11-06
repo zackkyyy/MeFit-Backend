@@ -1,6 +1,11 @@
 package se.experis.MeFitBackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author : Zacky Kharboutli
@@ -16,7 +21,6 @@ public class Workout {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int workoutId;
 
-
     @Column
     public String name;
 
@@ -29,13 +33,11 @@ public class Workout {
     @Column
     public int repetitions;
 
-    @OneToOne
-    @JoinColumn(name = "workoutFk" , insertable = false ,updatable = false)
-    private Set setFk;
+    @OneToMany
+    @JsonManagedReference
+    @JoinColumn(name = "workout_fk")
+    private List<Set> set = new ArrayList<Set>();
 
-    @OneToOne
-    @JoinColumn(name = "workoutFk")
-    private ProfileWorkout profileWorkoutFk;
 
     public Workout() {
     }
@@ -66,7 +68,7 @@ public class Workout {
         return workoutId;
     }
 
-    public Set getSetFk() {
-        return setFk;
+    public List<Set> getSet() {
+        return set;
     }
 }
