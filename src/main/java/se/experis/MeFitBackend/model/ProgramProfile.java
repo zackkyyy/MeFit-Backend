@@ -1,6 +1,8 @@
 package se.experis.MeFitBackend.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 /**
@@ -22,6 +24,7 @@ public class ProgramProfile {
     private Program programFk;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name="profile_fk")
     private Profile profileFk;
 

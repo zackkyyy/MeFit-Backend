@@ -28,7 +28,6 @@ public class Exercise {
     @Column
     public String imageLink;
 
-
     @Column
     public String videoLink;
 

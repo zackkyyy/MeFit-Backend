@@ -1,5 +1,7 @@
 package se.experis.MeFitBackend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import javax.persistence.Table;
 
@@ -17,6 +19,7 @@ public class ProgramWorkout {
     private int programWorkoutId;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name="program_fk")
     private Program programFk;
 

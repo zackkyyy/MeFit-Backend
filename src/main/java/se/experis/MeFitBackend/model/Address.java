@@ -1,5 +1,7 @@
 package se.experis.MeFitBackend.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ public class Address {
     private int postalCode;
 
     @OneToMany
+    @JsonManagedReference
     @JoinColumn(name="address_fk")
     private List<Profile> profileFk = new ArrayList<Profile>();
 
