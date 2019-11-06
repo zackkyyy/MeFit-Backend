@@ -1,7 +1,11 @@
 package se.experis.MeFitBackend.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Author : Zacky Kharboutli
@@ -23,6 +27,11 @@ public class Goal {
     @Column
     private Date endDate;
 
+    @OneToMany
+    @JsonManagedReference
+    @JoinColumn(name="goal_fk")
+    private List<GoalWorkout> goalWorkoutFk = new ArrayList<GoalWorkout>();
+
     public Goal(Boolean achieved, Date endDate) {
         this.achieved = achieved;
         this.endDate = endDate;
@@ -31,7 +40,7 @@ public class Goal {
     public Goal() {
     }
 
-    public int getId() {
+    public int getGoalId() {
         return goalId;
     }
 
@@ -41,5 +50,9 @@ public class Goal {
 
     public Date getEndDate() {
         return endDate;
+    }
+
+    public List<GoalWorkout> getGoalWorkoutFk() {
+        return goalWorkoutFk;
     }
 }

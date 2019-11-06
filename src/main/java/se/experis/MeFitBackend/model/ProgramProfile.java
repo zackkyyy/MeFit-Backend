@@ -47,4 +47,5 @@ public class ProgramProfile {
     public Profile getProfileFk() {
         return profileFk;
     }
+
 }

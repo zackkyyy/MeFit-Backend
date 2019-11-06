@@ -1,6 +1,9 @@
 package se.experis.MeFitBackend.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,6 +45,7 @@ public class Program {
     public String getCategory() {
         return category;
     }
+
 }
 
 

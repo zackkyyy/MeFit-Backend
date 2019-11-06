@@ -43,4 +43,5 @@ public class ProfileGoal {
     public Goal getGoalFk() {
         return goalFk;
     }
+
 }

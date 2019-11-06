@@ -20,12 +20,12 @@ public class Set {
     private int repetitions;
 
     @OneToOne
-    @JoinColumn(name = "exercise_fk")
+    @JoinColumn(name="exercise_fk")
     private Exercise exerciseFk;
 
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name = "workout_fk")
+    @JoinColumn(name="workout_fk")
     private Workout workoutFk;
 
     public Set() {
@@ -35,6 +35,10 @@ public class Set {
         this.repetitions = repetitions;
         this.exerciseFk = exerciseFk;
         this.workoutFk = workoutFk;
+    }
+
+    public int getSetId() {
+        return setId;
     }
 
     public int getRepetitions() {
@@ -48,4 +52,5 @@ public class Set {
     public Workout getWorkoutFk() {
         return workoutFk;
     }
+
 }

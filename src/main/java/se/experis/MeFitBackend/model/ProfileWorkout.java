@@ -13,9 +13,9 @@ import javax.persistence.*;
 @Entity
 public class ProfileWorkout {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int profileWorkoutId;
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private int profileWorkoutId;
 
     @ManyToOne
     @JsonBackReference
@@ -23,15 +23,16 @@ public class ProfileWorkout {
     private Profile profileFk;
 
     @OneToOne
-    @JoinColumn(name = "workout_fk")
+    @JoinColumn(name="workout_fk")
     private Workout workoutFk;
+
+
+    public ProfileWorkout() {
+    }
 
     public ProfileWorkout(Profile profileFk, Workout workoutFk) {
         this.profileFk = profileFk;
         this.workoutFk = workoutFk;
-    }
-
-    public ProfileWorkout() {
     }
 
     public int getProfileWorkoutId() {

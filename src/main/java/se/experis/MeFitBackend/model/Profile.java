@@ -38,15 +38,26 @@ public class Profile {
     @JoinColumn(name="end_user_fk")
     private EndUser endUserFk;
 
+    @OneToMany
+    @JsonManagedReference
+    @JoinColumn(name="profile_fk")
+    private List<ProfileGoal> profileGoalFk = new ArrayList<ProfileGoal>();
+
+    @OneToMany
+    @JsonManagedReference
+    @JoinColumn(name="profile_fk")
+    private List<ProgramProfile> programProfileFk = new ArrayList<ProgramProfile>();
+
+    @OneToMany
+    @JsonManagedReference
+    @JoinColumn(name="profile_fk")
+    private List<ProfileWorkout> profileWorkoutFk  = new ArrayList<ProfileWorkout>();
+
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name="address_fk")
     private Address addressFk;
 
-    @OneToMany
-    @JsonManagedReference
-    @JoinColumn(name="profile_fk")
-    private List<ProfileWorkout> profileWorkoutsFk  = new ArrayList<ProfileWorkout>();
 
     public Profile() {
     }
@@ -60,6 +71,9 @@ public class Profile {
         this.addressFk = addressFk;
     }
 
+    public int getProfileId() {
+        return profileId;
+    }
 
     public int getWeight() {
         return weight;
@@ -85,7 +99,15 @@ public class Profile {
         return addressFk;
     }
 
-    public List<ProfileWorkout> getProfileWorkoutsFk() {
-        return profileWorkoutsFk;
+    public List<ProfileGoal> getProfileGoalFk() {
+        return profileGoalFk;
+    }
+
+    public List<ProgramProfile> getProgramProfileFk() {
+        return programProfileFk;
+    }
+
+    public List<ProfileWorkout> getProfileWorkoutFk() {
+        return profileWorkoutFk;
     }
 }

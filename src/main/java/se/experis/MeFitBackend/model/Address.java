@@ -47,7 +47,7 @@ public class Address {
         this.postalCode = postalCode;
     }
 
-    public int getId() {
+    public int getAddressId() {
         return addressId;
     }
 
@@ -65,6 +65,10 @@ public class Address {
 
     public int getPostalCode() {
         return postalCode;
+    }
+
+    public List<Profile> getProfileFk() {
+        return profileFk;
     }
 }
 

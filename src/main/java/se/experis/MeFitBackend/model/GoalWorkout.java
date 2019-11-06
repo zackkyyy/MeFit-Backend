@@ -40,7 +40,7 @@ public class GoalWorkout {
     public GoalWorkout() {
     }
 
-    public int getId() {
+    public int getGoalWorkoutId() {
         return goalWorkoutId;
     }
 

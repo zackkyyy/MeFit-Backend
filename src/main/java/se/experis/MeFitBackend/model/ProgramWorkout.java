@@ -47,4 +47,5 @@ public class ProgramWorkout {
     public Workout getWorkoutFk() {
         return workoutFk;
     }
+
 }

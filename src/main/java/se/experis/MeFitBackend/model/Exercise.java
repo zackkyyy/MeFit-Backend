@@ -14,7 +14,7 @@ public class Exercise {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int exerciseID;
+    public int exerciseId;
 
     @Column
     public String name;
@@ -42,8 +42,8 @@ public class Exercise {
         this.videoLink = videoLink;
     }
 
-    public int getExerciseID() {
-        return exerciseID;
+    public int getExerciseId() {
+        return exerciseId;
     }
 
     public String getName() {

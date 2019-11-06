@@ -43,7 +43,7 @@ public class EndUser {
         this.email = email;
     }
 
-    public int getId() {
+    public int getEndUserId() {
         return endUserId;
     }
 
