@@ -19,9 +19,6 @@ public class GoalWorkout {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int goalWorkoutId;
 
-    @Column
-    private Date endDate;
-
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name="goal_fk")
@@ -31,8 +28,7 @@ public class GoalWorkout {
     @JoinColumn(name = "workout_fk")
     private Workout workoutFk;
 
-    public GoalWorkout(Date endDate, Goal goalFk, Workout workoutFk) {
-        this.endDate = endDate;
+    public GoalWorkout(Goal goalFk, Workout workoutFk) {
         this.goalFk = goalFk;
         this.workoutFk = workoutFk;
     }
@@ -42,10 +38,6 @@ public class GoalWorkout {
 
     public int getGoalWorkoutId() {
         return goalWorkoutId;
-    }
-
-    public Date getEndDate() {
-        return endDate;
     }
 
     public Goal getGoalFk() {

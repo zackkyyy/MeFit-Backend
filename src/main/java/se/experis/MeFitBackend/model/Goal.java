@@ -1,5 +1,6 @@
 package se.experis.MeFitBackend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -27,8 +28,16 @@ public class Goal {
     @Column
     private Date endDate;
 
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name="profile_fk")
+    private Profile profileFk;
+
     @OneToMany
-    @JsonManagedReference
+    @JoinColumn(name="goal_fk")
+    private List<Program> programFk = new ArrayList<Program>();
+
+    @OneToMany
     @JoinColumn(name="goal_fk")
     private List<GoalWorkout> goalWorkoutFk = new ArrayList<GoalWorkout>();
 
@@ -50,6 +59,14 @@ public class Goal {
 
     public Date getEndDate() {
         return endDate;
+    }
+
+    public Profile getProfileFk() {
+        return profileFk;
+    }
+
+    public List<Program> getProgramFk() {
+        return programFk;
     }
 
     public List<GoalWorkout> getGoalWorkoutFk() {

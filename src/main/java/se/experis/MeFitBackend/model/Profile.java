@@ -2,7 +2,6 @@ package se.experis.MeFitBackend.model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -39,19 +38,18 @@ public class Profile {
     private EndUser endUserFk;
 
     @OneToMany
-    @JsonManagedReference
+  //  @JsonManagedReference
     @JoinColumn(name="profile_fk")
-    private List<ProfileGoal> profileGoalFk = new ArrayList<ProfileGoal>();
+    private List<Goal> goalFk = new ArrayList<Goal>();
 
     @OneToMany
-    @JsonManagedReference
+    //@JsonManagedReference
     @JoinColumn(name="profile_fk")
-    private List<ProgramProfile> programProfileFk = new ArrayList<ProgramProfile>();
+    private List<Program> programFk = new ArrayList<Program>();
 
     @OneToMany
-    @JsonManagedReference
     @JoinColumn(name="profile_fk")
-    private List<ProfileWorkout> profileWorkoutFk  = new ArrayList<ProfileWorkout>();
+    private List<Workout> workoutFk = new ArrayList<Workout>();
 
     @ManyToOne
     @JsonBackReference
@@ -99,15 +97,15 @@ public class Profile {
         return addressFk;
     }
 
-    public List<ProfileGoal> getProfileGoalFk() {
-        return profileGoalFk;
+    public List<Workout> getWorkoutFk() {
+        return workoutFk;
     }
 
-    public List<ProgramProfile> getProgramProfileFk() {
-        return programProfileFk;
+    public List<Goal> getGoalFk() {
+        return goalFk;
     }
 
-    public List<ProfileWorkout> getProfileWorkoutFk() {
-        return profileWorkoutFk;
+    public List<Program> getProgramFk() {
+        return programFk;
     }
 }

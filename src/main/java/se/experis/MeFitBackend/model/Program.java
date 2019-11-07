@@ -1,6 +1,6 @@
 package se.experis.MeFitBackend.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -26,6 +26,21 @@ public class Program {
     @Column
     private String category;
 
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name="profile_fk")
+    private Profile profileFk;
+
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name="goal_fk")
+    private Goal goalFk;
+
+    @OneToMany
+    @JoinColumn(name="program_fk")
+    private List<ProgramWorkout> programWorkoutFk = new ArrayList<ProgramWorkout>();
+
+
     public Program(String name, String category) {
         this.name = name;
         this.category = category;
@@ -46,6 +61,17 @@ public class Program {
         return category;
     }
 
+    public Profile getProfileFk() {
+        return profileFk;
+    }
+
+    public Goal getGoalFk() {
+        return goalFk;
+    }
+
+    public List<ProgramWorkout> getProgramWorkoutFk() {
+        return programWorkoutFk;
+    }
 }
 
 

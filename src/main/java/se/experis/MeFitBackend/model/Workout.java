@@ -1,5 +1,6 @@
 package se.experis.MeFitBackend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -18,34 +19,44 @@ public class Workout {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int workoutId;
+    private int workoutId;
 
     @Column
-    public String name;
+    private String name;
 
     @Column
-    public String type;
+    private String type;
 
     @Column
-    public Boolean complete;
+    private Boolean complete;
 
     @Column
-    public int repetitions;
+    private int repetitions;
 
     @OneToMany
     @JsonManagedReference
     @JoinColumn(name = "workout_fk")
     private List<Set> set = new ArrayList<Set>();
 
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name="profile_fk")
+    private Profile profileFk;
+
 
     public Workout() {
     }
 
-    public Workout(String name, String type, Boolean complete, int repetitions) {
+    public Workout(String name, String type, Boolean complete, int repetitions, Profile profileFk) {
         this.name = name;
         this.type = type;
         this.complete = complete;
         this.repetitions = repetitions;
+        this.profileFk = profileFk;
+    }
+
+    public int getWorkoutId() {
+        return workoutId;
     }
 
     public String getName() {
@@ -63,11 +74,13 @@ public class Workout {
     public int getRepetitions() {
         return repetitions;
     }
-    public int getWorkoutId() {
-        return workoutId;
-    }
 
     public List<Set> getSet() {
         return set;
     }
+
+    public Profile getProfileFk() {
+        return profileFk;
+    }
+
 }
