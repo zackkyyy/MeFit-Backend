@@ -31,19 +31,19 @@ public class Program {
     @JoinColumn(name="profile_fk")
     private Profile profileFk;
 
-    @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name="goal_fk")
-    private Goal goalFk;
+    @OneToMany
+    @JoinColumn(name="program_fk")
+    private List<ProgramGoal> programGoalFk = new ArrayList<ProgramGoal>();
 
     @OneToMany
     @JoinColumn(name="program_fk")
     private List<ProgramWorkout> programWorkoutFk = new ArrayList<ProgramWorkout>();
 
 
-    public Program(String name, String category) {
+    public Program(String name, String category, Profile profileFk) {
         this.name = name;
         this.category = category;
+        this.profileFk = profileFk;
     }
 
     public Program() {
@@ -65,8 +65,8 @@ public class Program {
         return profileFk;
     }
 
-    public Goal getGoalFk() {
-        return goalFk;
+    public List<ProgramGoal> getProgramGoalFk() {
+        return programGoalFk;
     }
 
     public List<ProgramWorkout> getProgramWorkoutFk() {

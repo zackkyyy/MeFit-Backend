@@ -13,5 +13,4 @@ import java.util.List;
  */
 
 public interface ProgramRepository extends JpaRepository<Program, Integer> {
-    List<Program> findAllByGoalFk(int goalFk);
 }

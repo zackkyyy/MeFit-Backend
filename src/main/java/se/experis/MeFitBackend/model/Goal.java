@@ -35,15 +35,16 @@ public class Goal {
 
     @OneToMany
     @JoinColumn(name="goal_fk")
-    private List<Program> programFk = new ArrayList<Program>();
+    private List<GoalWorkout> goalWorkoutFk = new ArrayList<GoalWorkout>();
 
     @OneToMany
     @JoinColumn(name="goal_fk")
-    private List<GoalWorkout> goalWorkoutFk = new ArrayList<GoalWorkout>();
+    private List<ProgramGoal> programGoalFk = new ArrayList<ProgramGoal>();
 
-    public Goal(Boolean achieved, Date endDate) {
+    public Goal(Boolean achieved, Date endDate, Profile profileFk) {
         this.achieved = achieved;
         this.endDate = endDate;
+        this.profileFk = profileFk;
     }
 
     public Goal() {
@@ -65,11 +66,11 @@ public class Goal {
         return profileFk;
     }
 
-    public List<Program> getProgramFk() {
-        return programFk;
-    }
-
     public List<GoalWorkout> getGoalWorkoutFk() {
         return goalWorkoutFk;
+    }
+
+    public List<ProgramGoal> getProgramGoalFk() {
+        return programGoalFk;
     }
 }

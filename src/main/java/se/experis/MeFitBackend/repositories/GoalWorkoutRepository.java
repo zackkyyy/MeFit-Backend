@@ -13,5 +13,4 @@ import java.util.List;
  */
 
 public interface GoalWorkoutRepository extends JpaRepository<GoalWorkout, Integer> {
-    List<GoalWorkout> findAllByGoalFk(int goalFk);
 }
