@@ -1,11 +1,8 @@
 package se.experis.MeFitBackend.model;
 
-<<<<<<< HEAD
 import org.jboss.aerogear.security.otp.api.Base32;
-=======
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
->>>>>>> 140ac13c165b3ab8fbad7ba3e8745333a872e054
 
 import javax.persistence.*;
 
