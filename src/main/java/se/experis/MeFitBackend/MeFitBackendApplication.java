@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
+@EnableTransactionManagement
 public class MeFitBackendApplication {
 
 	public static void main(String[] args) {

@@ -1,6 +1,8 @@
 package se.experis.MeFitBackend.Controller;
 
+import org.hibernate.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,11 +11,17 @@ import se.experis.MeFitBackend.model.Set;
 import se.experis.MeFitBackend.repositories.ExerciseRepository;
 import se.experis.MeFitBackend.repositories.SetRepository;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 /*
     rjanul created on 2019-11-07
 */
 @RestController
 public class ExerciseController {
+    private final String rootURL = "http://localhost:8080/";
 
     @Autowired
     private final ExerciseRepository exerciseRepository;
@@ -24,27 +32,125 @@ public class ExerciseController {
         this.setRepository = setRepository;
     }
 
+    // Contributor only
     @PostMapping("/addExercise")
     public ResponseEntity addExercise(@RequestBody Exercise exercise){
-        exerciseRepository.save(exercise);
-        return new ResponseEntity(exercise, HttpStatus.CREATED);
+        HttpHeaders responseHeaders = new HttpHeaders();
+
+        try {
+            Exercise ex = exerciseRepository.save(exercise);
+
+            responseHeaders.setLocation(new URI(rootURL + "exercise/" + ex.getExerciseId()));
+        } catch (MappingException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (URISyntaxException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(exercise, responseHeaders, HttpStatus.CREATED);
     }
 
-    @GetMapping("/exercise/{ID}")
+    @GetMapping("/exercises/{ID}")
     public ResponseEntity getExercise(@PathVariable int ID){
-        return new ResponseEntity(exerciseRepository.findById(ID), HttpStatus.ACCEPTED);
+        Exercise ex;
+        try {
+            ex = exerciseRepository.findById(ID).get();
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity(ex, HttpStatus.ACCEPTED);
+    }
+
+    // Returns a list of currently available exercises arranged alphabetically by Target muscle
+    @GetMapping("/exercises")
+    public ResponseEntity getExerciseList(){
+        List<Exercise> ex;
+        try {
+            ex = exerciseRepository.findAllByOrderByTargetMuscleAsc();
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity(ex, HttpStatus.ACCEPTED);
+    }
+
+    // Contributor only
+    @PatchMapping("/exercises/{ID}")
+    public ResponseEntity patchExercise(@PathVariable int ID, @RequestBody Exercise exercise) {
+        try {
+            Exercise ex = new Exercise(
+                    exerciseRepository.getOne(ID).getExerciseId(),
+                    exercise.getName(),
+                    exercise.getDescription(),
+                    exercise.getTargetMuscle(),
+                    exercise.getImageLink(),
+                    exercise.getVideoLink()
+            );
+            exerciseRepository.save(ex);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    // Contributor only
+    @DeleteMapping("/exercises/{ID}")
+    public ResponseEntity deleteExercise(@PathVariable int ID) {
+
+        try {
+            exerciseRepository.deleteById(ID);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/addSet")
-    public ResponseEntity addSet(@RequestBody Set set){
-        System.out.println("this is set: " + set.toString());
+    public ResponseEntity addSet(@RequestBody Set set) {
+        HttpHeaders responseHeaders = new HttpHeaders();
 
-        setRepository.save(set);
+        try {
+            Set ss = setRepository.save(set);
+
+            URI location = new URI(rootURL + "set/" + ss.getSetId());
+            responseHeaders.setLocation(location);
+        } catch (MappingException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (URISyntaxException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(set, HttpStatus.CREATED);
     }
 
     @GetMapping("/set/{ID}")
     public ResponseEntity getSet(@PathVariable int ID){
-        return new ResponseEntity(setRepository.findById(ID), HttpStatus.ACCEPTED);
+        Set set;
+        try {
+            set = setRepository.findById(ID).get();
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(set, HttpStatus.ACCEPTED);
     }
 }

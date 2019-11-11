@@ -51,7 +51,7 @@ public class GoalsController {
         // profileId, achieved, endDate // list workoutId or/and list programId
         // this will need to be a transction
         System.out.println("these are the params: " + params);
-        Profile profile = profileRepository.findById(params.get("profileId").intValue()).get();
+        Profile profile = profileRepository.getOne(params.get("profileId").intValue());
 
         Goal goal = new Goal(
             params.get("achieved").asBoolean(),

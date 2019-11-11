@@ -2,6 +2,8 @@ package se.experis.MeFitBackend.model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -34,20 +36,22 @@ public class Profile {
     private String fitnessLevel;
 
     @OneToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="end_user_fk")
     private EndUser endUserFk;
 
     @OneToMany
-  //  @JsonManagedReference
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="profile_fk")
     private List<Goal> goalFk = new ArrayList<Goal>();
 
     @OneToMany
-    //@JsonManagedReference
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="profile_fk")
     private List<Program> programFk = new ArrayList<Program>();
 
     @OneToMany
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="profile_fk")
     private List<Workout> workoutFk = new ArrayList<Workout>();
 

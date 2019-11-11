@@ -1,6 +1,11 @@
 package se.experis.MeFitBackend.model;
 
+<<<<<<< HEAD
 import org.jboss.aerogear.security.otp.api.Base32;
+=======
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+>>>>>>> 140ac13c165b3ab8fbad7ba3e8745333a872e054
 
 import javax.persistence.*;
 
@@ -39,11 +44,15 @@ public class EndUser {
     public EndUser() {
     }
 
-    public EndUser(String firstname, String lastname, String password, int role, String email) {
+    public EndUser(int endUserId, String password) {
+        this.endUserId = endUserId;
+        this.password = password;
+    }
+
+    public EndUser(int endUserId, String firstname, String lastname, String email) {
+        this.endUserId = endUserId;
         this.firstname = firstname;
         this.lastname = lastname;
-        this.password = password;
-        this.role = role;
         this.email = email;
         this.secret = Base32.random();
     }

@@ -40,7 +40,7 @@ public class ProgramController {
     @PostMapping("/addProgram")
     public ResponseEntity addGoal(@RequestBody ObjectNode params) {
         // name, category, profileId (who creates it), list of workoutId
-        Profile profile = profileRepository.findById(params.get("profileId").intValue()).get();
+        Profile profile = profileRepository.getOne(params.get("profileId").intValue());
 
         Program program = new Program(
             params.get("name").asText(),
