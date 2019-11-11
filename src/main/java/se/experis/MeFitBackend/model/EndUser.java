@@ -1,5 +1,8 @@
 package se.experis.MeFitBackend.model;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 
 /**
@@ -35,11 +38,15 @@ public class EndUser {
     public EndUser() {
     }
 
-    public EndUser(String firstname, String lastname, String password, int role, String email) {
+    public EndUser(int endUserId, String password) {
+        this.endUserId = endUserId;
+        this.password = password;
+    }
+
+    public EndUser(int endUserId, String firstname, String lastname, String email) {
+        this.endUserId = endUserId;
         this.firstname = firstname;
         this.lastname = lastname;
-        this.password = password;
-        this.role = role;
         this.email = email;
     }
 
@@ -65,5 +72,9 @@ public class EndUser {
 
     public String getEmail() {
         return email;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
     }
 }
