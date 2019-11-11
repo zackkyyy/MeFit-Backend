@@ -1,0 +1,255 @@
+package se.experis.MeFitBackend.totpConfiguration;
+
+/**
+ * Author : Zacky Kharboutli
+ * Date : 2019-11-07
+ * Project: MeFit-Backend
+ */
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+
+/**
+ *
+ * @author Ivan
+ */
+public class TOTPAuthenticator {
+
+    /**
+     * the Unix time to start counting time steps (default value is 0)
+     */
+    private static final long TIME_START = 0L;
+
+    /**
+     * the length of generated time-based one-time password (default value is 6)
+     */
+    private int totpLength;
+
+    /**
+     * the time step in seconds
+     */
+    private int timeStepSize;
+
+    /**
+     * When an OTP is generated at the end of a time-step window, the receiving
+     * time most likely falls into the next time-step window. A validation
+     * system SHOULD typically set a policy for an acceptable OTP transmission
+     * delay window for validation. The validation system should compare OTPs
+     * not only with the receiving timestamp but also the past timestamps that
+     * are within the transmission delay. The allowedPastValidationWindows
+     * represents the number of previous time-step windows that the
+     * authenticator will calculate and if a calculated OTP in a time-step
+     * window matches user input, then the validation is considered as
+     * successful. The default value is 2.
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc6238#section-5.2">Validation
+     *      and Time-Step Size</a>
+     */
+    private int allowedPastValidationWindows;
+
+    /**
+     * The allowedFutureValidationWindows is similar to
+     * {@link #allowedFutureValidationWindows allowedPastValidationWindows} but
+     * it represents the number of following time-step windows that the
+     * authenticator will calculate. The default value is 0.
+     *
+     */
+    private int allowedFutureValidationWindows;
+
+    /**
+     * The default value is SHA1
+     */
+    private HMACHashAlgorithm hashAlgorithm;
+
+    /**
+     * Decoder is used to decode the string to byte array when users provide a
+     * string format key instead of byte array format. The default value is
+     * SHA1Decoder.
+     */
+    private Decoder decoder;
+
+    private TOTPAuthenticator() {
+    }
+
+    private TOTPAuthenticator(int totpLength, int timeStepSize, int allowedPastValidationWindows,
+                              int allowedFutureValidationWindows, HMACHashAlgorithm hashAlgorithm, Decoder decoder) {
+        super();
+        this.totpLength = totpLength;
+        this.timeStepSize = timeStepSize;
+        this.allowedPastValidationWindows = allowedPastValidationWindows;
+        this.allowedFutureValidationWindows = allowedFutureValidationWindows;
+        this.hashAlgorithm = hashAlgorithm;
+        this.decoder = decoder;
+    }
+
+    public static TOTPAuthenticatorBuilder builder() {
+        return new TOTPAuthenticatorBuilder();
+    }
+
+    public static class TOTPAuthenticatorBuilder {
+        private int totpLength = 6;
+        private int timeStepSize = 30;
+        private int allowedPastValidationWindows = 2;
+        private int allowedFutureValidationWindows = 0;
+        private HMACHashAlgorithm hashAlgorithm = HMACHashAlgorithm.SHA_1;
+        private Decoder decoder = new SHA1Decoder();
+
+        private TOTPAuthenticatorBuilder() {
+        }
+
+        public TOTPAuthenticatorBuilder totpLength(int totpLength) {
+            this.totpLength = totpLength;
+            return this;
+        }
+
+        public TOTPAuthenticatorBuilder timeStepSize(int timeStepSize) {
+            this.timeStepSize = timeStepSize;
+            return this;
+        }
+
+        public TOTPAuthenticatorBuilder allowedPastValidationWindows(int allowedPastValidationWindows) {
+            this.allowedPastValidationWindows = allowedPastValidationWindows;
+            return this;
+        }
+
+        public TOTPAuthenticatorBuilder allowedFutureValidationWindows(int allowedFutureValidationWindows) {
+            this.allowedFutureValidationWindows = allowedFutureValidationWindows;
+            return this;
+        }
+
+        public TOTPAuthenticatorBuilder hashAlgorithm(HMACHashAlgorithm hashAlgorithm) {
+            this.hashAlgorithm = hashAlgorithm;
+            return this;
+        }
+
+        public TOTPAuthenticatorBuilder decoder(Decoder decoder) {
+            this.decoder = decoder;
+            return this;
+        }
+
+        public TOTPAuthenticator build() {
+            return new TOTPAuthenticator(totpLength, timeStepSize, allowedPastValidationWindows,
+                    allowedFutureValidationWindows, hashAlgorithm, decoder);
+        }
+    }
+
+    /**
+     * generate a time-based one-time password with a given key at the receiving
+     * time.
+     *
+     * @param key
+     *            the secret key in binary format.
+     * @return one-time password generated by the secret key at the receiving
+     *         time
+     */
+    public String generateTOTP(byte[] key) {
+        return calculateTOTP(key, getTimeStepWindowFromTimestamp(new Date().getTime()));
+    }
+
+    /**
+     * check the validity of the given secret key and the time-based one-time
+     * password.The validation system should compare OTPs not only with the
+     * receiving timestamp but also the past time-steps that are within the
+     * allowedValidationWinows.
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc6238#section-5.2">rfc6238</a>
+     *
+     * @param key
+     *            the secret key in binary format.
+     * @param totpFromProver
+     *            password from prover to be validated.
+     * @return true if the totpFromProver equals any totp in the
+     *         allowedValidationWindows.
+     *
+     */
+    public boolean validateTOTP(byte[] key, String totpFromProver) {
+        if (isTOTP(totpFromProver)) {
+            final long receivedTimeStepWindow = getTimeStepWindowFromTimestamp(System.currentTimeMillis());
+            for (int i = 0 - allowedPastValidationWindows; i <= allowedFutureValidationWindows; i++) {
+                String totpCalculated = calculateTOTP(key, receivedTimeStepWindow + i);
+                if (totpCalculated.equals(totpFromProver)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public String generateTOTP(String key) {
+        return generateTOTP(decoder.decode(key));
+    }
+
+    public boolean validateTOTP(String key, String totpFromProver) {
+        return validateTOTP(decoder.decode(key), totpFromProver);
+    }
+
+    private String calculateTOTP(byte[] key, long timeStepWindow) {
+        byte[] data = new byte[8];
+        long value = timeStepWindow;
+        for (int i = 8; i-- > 0; value >>>= 8) {
+            data[i] = (byte) value;
+        }
+        SecretKeySpec signKey = new SecretKeySpec(key, hashAlgorithm.getAlgorithm());
+        try {
+            // Step 1:Generate an HMAC-SHA-1 value Let HS = HMAC-SHA-1(K,C)
+            Mac mac = Mac.getInstance(hashAlgorithm.getAlgorithm());
+            mac.init(signKey);
+            byte[] hmac_result = mac.doFinal(data);
+
+            // Step 2: Generate a 4-byte string,from byte hmac_result[offset]
+            int offset = hmac_result[hmac_result.length - 1] & 0xF;
+            int truncatedHash = (hmac_result[offset] & 0x7f) << 24 | (hmac_result[offset + 1] & 0xff) << 16
+                    | (hmac_result[offset + 2] & 0xff) << 8 | (hmac_result[offset + 3] & 0xff);
+
+            // Step 3:Compute an HOTP value
+            truncatedHash %= ((int) Math.pow(10, totpLength));
+            String totp = Integer.toString(truncatedHash);
+            while (totp.length() < totpLength) {
+                totp = "0" + totp;
+            }
+            return totp;
+        } catch (NoSuchAlgorithmException | InvalidKeyException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    private long getTimeStepWindowFromTimestamp(long milliSeconds) {
+        return (milliSeconds - TIME_START) / TimeUnit.SECONDS.toMillis(timeStepSize);
+    }
+
+    private boolean isTOTP(String str) {
+        if (str.length() != totpLength)
+            return false;
+        return str.matches("\\d+");
+    }
+
+    public int getTotpLength() {
+        return totpLength;
+    }
+
+    public int getTimeStepSize() {
+        return timeStepSize;
+    }
+
+    public int getAllowedPastValidationWindows() {
+        return allowedPastValidationWindows;
+    }
+
+    public int getAllowedFutureValidationWindows() {
+        return allowedFutureValidationWindows;
+    }
+
+    public HMACHashAlgorithm getHashAlgorithm() {
+        return hashAlgorithm;
+    }
+
+    public Decoder getDecoder() {
+        return decoder;
+    }
+}

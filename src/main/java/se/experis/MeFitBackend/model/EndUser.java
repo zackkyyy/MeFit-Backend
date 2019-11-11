@@ -1,5 +1,7 @@
 package se.experis.MeFitBackend.model;
 
+import org.jboss.aerogear.security.otp.api.Base32;
+
 import javax.persistence.*;
 
 /**
@@ -32,6 +34,8 @@ public class EndUser {
     @Column(unique=true)
     public String email;
 
+    private String secret;
+
     public EndUser() {
     }
 
@@ -41,6 +45,7 @@ public class EndUser {
         this.password = password;
         this.role = role;
         this.email = email;
+        this.secret = Base32.random();
     }
 
     public int getEndUserId() {
