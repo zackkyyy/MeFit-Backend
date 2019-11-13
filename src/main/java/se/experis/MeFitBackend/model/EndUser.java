@@ -46,6 +46,14 @@ public class EndUser {
         this.password = password;
     }
 
+    public EndUser(String firstname, String lastname, String password, String email) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.password = password;
+        this.email = email;
+    }
+
+
     public EndUser(int endUserId, String firstname, String lastname, String email) {
         this.endUserId = endUserId;
         this.firstname = firstname;

@@ -18,7 +18,6 @@ import java.util.List;
 @Table
 public class Profile {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int profileId;
@@ -36,22 +35,19 @@ public class Profile {
     private String fitnessLevel;
 
     @OneToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="end_user_fk")
     private EndUser endUserFk;
 
-    @OneToMany
+    @OneToMany(orphanRemoval=true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="profile_fk")
     private List<Goal> goalFk = new ArrayList<Goal>();
 
     @OneToMany
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="profile_fk")
     private List<Program> programFk = new ArrayList<Program>();
 
     @OneToMany
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="profile_fk")
     private List<Workout> workoutFk = new ArrayList<Workout>();
 
@@ -62,6 +58,14 @@ public class Profile {
 
 
     public Profile() {
+    }
+
+    public Profile(int profileId, int weight, int height, int age, String fitnessLevel) {
+        this.profileId = profileId;
+        this.weight = weight;
+        this.height = height;
+        this.age = age;
+        this.fitnessLevel = fitnessLevel;
     }
 
     public Profile(int weight, int height, int age, String fitnessLevel, EndUser endUserFk, Address addressFk) {

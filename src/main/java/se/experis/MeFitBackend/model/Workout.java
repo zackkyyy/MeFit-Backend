@@ -27,12 +27,6 @@ public class Workout {
     @Column
     private String type;
 
-    @Column
-    private Boolean complete;
-
-    @Column
-    private int repetitions;
-
     @OneToMany
     @JsonManagedReference
     @JoinColumn(name = "workout_fk")
@@ -47,11 +41,9 @@ public class Workout {
     public Workout() {
     }
 
-    public Workout(String name, String type, Boolean complete, int repetitions, Profile profileFk) {
+    public Workout(String name, String type, Profile profileFk) {
         this.name = name;
         this.type = type;
-        this.complete = complete;
-        this.repetitions = repetitions;
         this.profileFk = profileFk;
     }
 
@@ -67,14 +59,6 @@ public class Workout {
         return type;
     }
 
-    public Boolean getComplete() {
-        return complete;
-    }
-
-    public int getRepetitions() {
-        return repetitions;
-    }
-
     public List<Set> getSet() {
         return set;
     }
@@ -83,4 +67,7 @@ public class Workout {
         return profileFk;
     }
 
+    public void setProfileFk(Profile profileFk) {
+        this.profileFk = profileFk;
+    }
 }

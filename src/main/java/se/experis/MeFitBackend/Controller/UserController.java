@@ -6,10 +6,13 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
+import se.experis.MeFitBackend.Global.stuff;
 import se.experis.MeFitBackend.model.EndUser;
 import se.experis.MeFitBackend.repositories.EndUserRepository;
 
+import javax.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.NoSuchElementException;
@@ -19,7 +22,6 @@ import java.util.NoSuchElementException;
 */
 @RestController
 public class UserController {
-    private final String rootURL = "http://localhost:8080/";
 
     @Autowired
     private final EndUserRepository endUserRepository;
@@ -33,7 +35,7 @@ public class UserController {
         HttpHeaders responseHeaders = new HttpHeaders();
         try {
             EndUser usr = endUserRepository.save(user);
-            responseHeaders.setLocation(new URI(rootURL + "user/" + usr.getEndUserId()));
+            responseHeaders.setLocation(new URI(stuff.rootURL + "user/" + usr.getEndUserId()));
         } catch (DuplicateKeyException e) {
             return new ResponseEntity(HttpStatus.CONFLICT);
         } catch (MappingException e) {
@@ -72,7 +74,7 @@ public class UserController {
 //                }
 //            }
 
-            URI location = new URI(rootURL + "user/" + ID);
+            URI location = new URI(stuff.rootURL + "user/" + ID);
             responseHeaders.setLocation(location);
 
             endUserRepository.save(usr);
@@ -142,15 +144,19 @@ public class UserController {
 //    }
 
     @DeleteMapping("user/{ID}")
+    @Transactional
     public ResponseEntity deleteUser(@PathVariable int ID){
 
         try {
             endUserRepository.deleteById(ID);
         } catch (NoSuchElementException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.NO_CONTENT);

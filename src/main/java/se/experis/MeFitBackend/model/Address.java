@@ -47,6 +47,14 @@ public class Address {
         this.postalCode = postalCode;
     }
 
+    public Address(int addressId, String street, String city, String country, int postalCode) {
+        this.addressId = addressId;
+        this.street = street;
+        this.city = city;
+        this.country = country;
+        this.postalCode = postalCode;
+    }
+
     public int getAddressId() {
         return addressId;
     }

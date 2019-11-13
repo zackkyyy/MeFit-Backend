@@ -8,36 +8,39 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
-import se.experis.MeFitBackend.model.Address;
-import se.experis.MeFitBackend.model.EndUser;
-import se.experis.MeFitBackend.model.Profile;
-import se.experis.MeFitBackend.repositories.AddressRepository;
-import se.experis.MeFitBackend.repositories.EndUserRepository;
-import se.experis.MeFitBackend.repositories.ProfileRepository;
+import se.experis.MeFitBackend.Global.stuff;
+import se.experis.MeFitBackend.model.*;
+import se.experis.MeFitBackend.repositories.*;
 
 import javax.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /*
     rjanul created on 2019-11-07
 */
 @RestController
 public class ProfileController {
-    private final String rootURL = "http://localhost:8080/";
 
     @Autowired
     private final AddressRepository addressRepository;
     private final EndUserRepository endUserRepository;
     private final ProfileRepository profileRepository;
+    private final ProgramRepository programRepository;
+    private final WorkoutRepository workoutRepository;
 
-    public ProfileController(AddressRepository addressRepository, EndUserRepository endUserRepository, ProfileRepository profileRepository) {
+
+    public ProfileController(AddressRepository addressRepository, EndUserRepository endUserRepository, ProfileRepository profileRepository, ProgramRepository programRepository, WorkoutRepository workoutRepository) {
         this.addressRepository = addressRepository;
         this.endUserRepository = endUserRepository;
         this.profileRepository = profileRepository;
+        this.programRepository = programRepository;
+        this.workoutRepository = workoutRepository;
     }
 
-    @PostMapping(value = "/createProfile")
+    @PostMapping("/createProfile")
     @Transactional
     public ResponseEntity createProfile(@RequestBody ObjectNode params){
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -65,7 +68,7 @@ public class ProfileController {
             );
             profileRepository.save(profile);
 
-            responseHeaders.setLocation(new URI(rootURL + "profile/" + profile.getProfileId()));
+            responseHeaders.setLocation(new URI(stuff.rootURL + "profile/" + profile.getProfileId()));
         } catch (MappingException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -81,6 +84,94 @@ public class ProfileController {
 
     @GetMapping("/profile/{ID}")
     public ResponseEntity getProfile(@PathVariable int ID){
-        return new ResponseEntity(profileRepository.findById(ID), HttpStatus.ACCEPTED);
+        Profile prof;
+        try {
+            prof = profileRepository.findById(ID).get();
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity(prof, HttpStatus.ACCEPTED);
+    }
+
+    // TODO: check if user is updating his profile and not someone else
+    @PatchMapping("/profile/{ID}")
+    @Transactional
+    public ResponseEntity patchProfile(@PathVariable int ID, @RequestBody ObjectNode params) {
+        // height / weight / age / fitnessLevel
+        // street / city / country / postalCode
+        try {
+            Profile prof = new Profile(
+                    profileRepository.getOne(ID).getProfileId(),
+                    params.get("height").intValue(),
+                    params.get("weight").intValue(),
+                    params.get("age").intValue(),
+                    params.get("fitnessLevel").asText()
+            );
+            profileRepository.save(prof);
+
+            Address addr = new Address(
+                    profileRepository.getOne(ID).getAddressFk().getAddressId(),
+                    params.get("street").asText(),
+                    params.get("city").asText(),
+                    params.get("country").asText(),
+                    params.get("postalCode").intValue()
+            );
+            addressRepository.save(addr);
+        } catch (NoSuchElementException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    // TODO: user only / contributor
+    // check if user is actually deleteting himself and not other user
+    // check if user is contributor
+    @DeleteMapping("profile/{ID}")
+    @Transactional
+    public ResponseEntity deleteProfile(@PathVariable int ID) {
+        // Deleting a profile will delete everything connected to the user except user itself
+        // address / program_goal / goal / goal_workout
+        // if contributor it will change foreign keys for program / workout to null
+        try {
+            int addressId = profileRepository.getOne(ID).getAddressFk().getAddressId();
+            // If address row is connected to only one row, delete it, otherwise do not
+            if(profileRepository.findAllByAddressFk(addressId).size() == 1) {
+                addressRepository.deleteById(addressId);
+            }
+            // if contributor, change foreign key to null for program
+            List<Program> programList = programRepository.findAllByProfileFk(ID);
+            for(int i = 0; i < programList.size(); i++) {
+                Program prg = programRepository.getOne(programList.get(i).getProgramId());
+                prg.setProfileFk(null);
+                programRepository.save(prg);
+            }
+            // if contributor, change foreign key to null for workout
+            List<Workout> workoutList = workoutRepository.findAllByProfileFk(ID);
+            for(int i = 0; i < programList.size(); i++) {
+                Workout wrk = workoutRepository.getOne(workoutList.get(i).getWorkoutId());
+                wrk.setProfileFk(null);
+                workoutRepository.save(wrk);
+            }
+
+            profileRepository.deleteById(ID);
+        } catch (NoSuchElementException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

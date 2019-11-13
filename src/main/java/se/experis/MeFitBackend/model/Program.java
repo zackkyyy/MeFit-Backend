@@ -72,6 +72,10 @@ public class Program {
     public List<ProgramWorkout> getProgramWorkoutFk() {
         return programWorkoutFk;
     }
+
+    public void setProfileFk(Profile profileFk) {
+        this.profileFk = profileFk;
+    }
 }
 
 

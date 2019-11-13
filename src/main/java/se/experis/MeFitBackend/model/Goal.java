@@ -33,15 +33,22 @@ public class Goal {
     @JoinColumn(name="profile_fk")
     private Profile profileFk;
 
-    @OneToMany
+    @OneToMany(orphanRemoval=true)
     @JoinColumn(name="goal_fk")
     private List<GoalWorkout> goalWorkoutFk = new ArrayList<GoalWorkout>();
 
-    @OneToMany
+    @OneToMany(orphanRemoval=true)
     @JoinColumn(name="goal_fk")
     private List<ProgramGoal> programGoalFk = new ArrayList<ProgramGoal>();
 
     public Goal(Boolean achieved, Date endDate, Profile profileFk) {
+        this.achieved = achieved;
+        this.endDate = endDate;
+        this.profileFk = profileFk;
+    }
+
+    public Goal(int goalId, Boolean achieved, Date endDate, Profile profileFk) {
+        this.goalId = goalId;
         this.achieved = achieved;
         this.endDate = endDate;
         this.profileFk = profileFk;

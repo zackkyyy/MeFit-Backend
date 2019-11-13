@@ -34,6 +34,14 @@ public class Exercise {
     public Exercise() {
     }
 
+    public Exercise(String name, String description, String targetMuscle, String imageLink, String videoLink) {
+        this.name = name;
+        this.description = description;
+        this.targetMuscle = targetMuscle;
+        this.imageLink = imageLink;
+        this.videoLink = videoLink;
+    }
+
     public Exercise(int exerciseId, String name, String description, String targetMuscle, String imageLink, String videoLink) {
         this.exerciseId = exerciseId;
         this.name = name;
