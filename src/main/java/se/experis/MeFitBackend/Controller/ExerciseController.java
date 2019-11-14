@@ -2,12 +2,12 @@ package se.experis.MeFitBackend.Controller;
 
 import org.hibernate.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
-import se.experis.MeFitBackend.Global.stuff;
 import se.experis.MeFitBackend.model.Exercise;
 import se.experis.MeFitBackend.model.Set;
 import se.experis.MeFitBackend.repositories.ExerciseRepository;
@@ -24,6 +24,9 @@ import java.util.NoSuchElementException;
 */
 @RestController
 public class ExerciseController {
+
+    @Value("${rootURL}")
+    private URI rootURL;
 
     @Autowired
     private final ExerciseRepository exerciseRepository;
@@ -42,7 +45,7 @@ public class ExerciseController {
         try {
             Exercise ex = exerciseRepository.save(exercise);
 
-            responseHeaders.setLocation(new URI(stuff.rootURL + "exercise/" + ex.getExerciseId()));
+            responseHeaders.setLocation(new URI(rootURL + "exercise/" + ex.getExerciseId()));
         } catch (MappingException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (URISyntaxException e) {
@@ -92,14 +95,19 @@ public class ExerciseController {
             if(!exerciseRepository.existsById(ID)) {
                 return new ResponseEntity(HttpStatus.NOT_FOUND);
             }
-            Exercise ex = exerciseRepository.getOne(ID);
-            ex.setName(exercise.getName());
-            ex.setDescription(exercise.getDescription());
-            ex.setTargetMuscle(exercise.getTargetMuscle());
-            ex.setImageLink(exercise.getImageLink());
-            ex.setVideoLink(exercise.getVideoLink());
+            if(setRepository.findTopByExerciseFk(exerciseRepository.findById(ID).get()) != null) {
+                return new ResponseEntity(HttpStatus.CONFLICT);
+            } else {
+                Exercise ex = exerciseRepository.getOne(ID);
+                ex.setName(exercise.getName());
+                ex.setDescription(exercise.getDescription());
+                ex.setTargetMuscle(exercise.getTargetMuscle());
+                ex.setImageLink(exercise.getImageLink());
+                ex.setVideoLink(exercise.getVideoLink());
 
-            exerciseRepository.save(ex);
+                exerciseRepository.save(ex);
+            }
+
         } catch (NoSuchElementException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -113,15 +121,15 @@ public class ExerciseController {
     @DeleteMapping("/exercises/{ID}")
     @Transactional
     public ResponseEntity deleteExercise(@PathVariable int ID) {
-
         try {
-            exerciseRepository.deleteById(ID);
+            if(setRepository.findTopByExerciseFk(exerciseRepository.findById(ID).get()) == null) {
+                exerciseRepository.deleteById(ID);
+            } else {
+                return new ResponseEntity(HttpStatus.CONFLICT);
+            }
         } catch (NoSuchElementException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -136,7 +144,7 @@ public class ExerciseController {
         try {
             Set ss = setRepository.save(set);
 
-            URI location = new URI(stuff.rootURL + "set/" + ss.getSetId());
+            URI location = new URI(rootURL + "set/" + ss.getSetId());
             responseHeaders.setLocation(location);
         } catch (MappingException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);

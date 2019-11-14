@@ -2,13 +2,13 @@ package se.experis.MeFitBackend.Controller;
 
 import org.hibernate.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
-import se.experis.MeFitBackend.Global.stuff;
 import se.experis.MeFitBackend.model.EndUser;
 import se.experis.MeFitBackend.repositories.EndUserRepository;
 
@@ -23,6 +23,9 @@ import java.util.NoSuchElementException;
 @RestController
 public class UserController {
 
+    @Value("${rootURL}")
+    private URI rootURL;
+
     @Autowired
     private final EndUserRepository endUserRepository;
 
@@ -35,7 +38,7 @@ public class UserController {
         HttpHeaders responseHeaders = new HttpHeaders();
         try {
             EndUser usr = endUserRepository.save(user);
-            responseHeaders.setLocation(new URI(stuff.rootURL + "user/" + usr.getEndUserId()));
+            responseHeaders.setLocation(new URI(rootURL + "user/" + usr.getEndUserId()));
         } catch (DuplicateKeyException e) {
             return new ResponseEntity(HttpStatus.CONFLICT);
         } catch (MappingException e) {
@@ -55,7 +58,6 @@ public class UserController {
         if(endUser.getPassword() != null) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        HttpHeaders responseHeaders = new HttpHeaders();
         try {
             EndUser usr = new EndUser(
                     endUserRepository.getOne(ID).getEndUserId(),
@@ -74,15 +76,11 @@ public class UserController {
 //                }
 //            }
 
-            URI location = new URI(stuff.rootURL + "user/" + ID);
-            responseHeaders.setLocation(location);
 
             endUserRepository.save(usr);
         } catch (DuplicateKeyException e) {
             return new ResponseEntity(HttpStatus.CONFLICT);
         } catch (MappingException e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        } catch (URISyntaxException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);

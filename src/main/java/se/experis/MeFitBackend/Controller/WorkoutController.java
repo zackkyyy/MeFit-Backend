@@ -3,12 +3,12 @@ package se.experis.MeFitBackend.Controller;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.hibernate.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
-import se.experis.MeFitBackend.Global.stuff;
 import se.experis.MeFitBackend.model.Profile;
 import se.experis.MeFitBackend.model.Set;
 import se.experis.MeFitBackend.model.Workout;
@@ -24,6 +24,9 @@ import java.util.NoSuchElementException;
 */
 @RestController
 public class WorkoutController {
+
+    @Value("${rootURL}")
+    private URI rootURL;
 
     @Autowired
     private final WorkoutRepository workoutRepository;
@@ -81,7 +84,7 @@ public class WorkoutController {
                 ));
             }
 
-            responseHeaders.setLocation(new URI(stuff.rootURL + "workout/" + wrk.getWorkoutId()));
+            responseHeaders.setLocation(new URI(rootURL + "workout/" + wrk.getWorkoutId()));
 
         } catch (MappingException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

@@ -3,12 +3,12 @@ package se.experis.MeFitBackend.Controller;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.hibernate.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
-import se.experis.MeFitBackend.Global.stuff;
 import se.experis.MeFitBackend.model.*;
 import se.experis.MeFitBackend.repositories.*;
 
@@ -23,6 +23,9 @@ import java.util.NoSuchElementException;
 */
 @RestController
 public class ProfileController {
+
+    @Value("${rootURL}")
+    private URI rootURL;
 
     @Autowired
     private final AddressRepository addressRepository;
@@ -68,7 +71,7 @@ public class ProfileController {
             );
             profileRepository.save(profile);
 
-            responseHeaders.setLocation(new URI(stuff.rootURL + "profile/" + profile.getProfileId()));
+            responseHeaders.setLocation(new URI(rootURL + "profile/" + profile.getProfileId()));
         } catch (MappingException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
