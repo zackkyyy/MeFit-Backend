@@ -88,14 +88,17 @@ public class ExerciseController {
     @PatchMapping("/exercises/{ID}")
     public ResponseEntity patchExercise(@PathVariable int ID, @RequestBody Exercise exercise) {
         try {
-            Exercise ex = new Exercise(
-                    exerciseRepository.getOne(ID).getExerciseId(),
-                    exercise.getName(),
-                    exercise.getDescription(),
-                    exercise.getTargetMuscle(),
-                    exercise.getImageLink(),
-                    exercise.getVideoLink()
-            );
+            // check if exercise exist
+            if(!exerciseRepository.existsById(ID)) {
+                return new ResponseEntity(HttpStatus.NOT_FOUND);
+            }
+            Exercise ex = exerciseRepository.getOne(ID);
+            ex.setName(exercise.getName());
+            ex.setDescription(exercise.getDescription());
+            ex.setTargetMuscle(exercise.getTargetMuscle());
+            ex.setImageLink(exercise.getImageLink());
+            ex.setVideoLink(exercise.getVideoLink());
+
             exerciseRepository.save(ex);
         } catch (NoSuchElementException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);

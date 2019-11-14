@@ -34,6 +34,7 @@ public class Set {
     public Set() {
     }
 
+
     public Set(int repetitions, int setRepetitions, Exercise exerciseFk, Workout workoutFk) {
         this.repetitions = repetitions;
         this.setRepetitions = setRepetitions;

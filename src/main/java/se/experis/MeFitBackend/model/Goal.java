@@ -80,4 +80,20 @@ public class Goal {
     public List<ProgramGoal> getProgramGoalFk() {
         return programGoalFk;
     }
+
+    public void setGoalId(int goalId) {
+        this.goalId = goalId;
+    }
+
+    public void setAchieved(Boolean achieved) {
+        this.achieved = achieved;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setProfileFk(Profile profileFk) {
+        this.profileFk = profileFk;
+    }
 }

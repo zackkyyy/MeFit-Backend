@@ -31,11 +31,11 @@ public class Program {
     @JoinColumn(name="profile_fk")
     private Profile profileFk;
 
-    @OneToMany
+    @OneToMany(orphanRemoval=true)
     @JoinColumn(name="program_fk")
     private List<ProgramGoal> programGoalFk = new ArrayList<ProgramGoal>();
 
-    @OneToMany
+    @OneToMany(orphanRemoval=true)
     @JoinColumn(name="program_fk")
     private List<ProgramWorkout> programWorkoutFk = new ArrayList<ProgramWorkout>();
 
@@ -75,6 +75,14 @@ public class Program {
 
     public void setProfileFk(Profile profileFk) {
         this.profileFk = profileFk;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }
 

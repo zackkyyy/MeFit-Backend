@@ -12,14 +12,12 @@ import se.experis.MeFitBackend.Global.stuff;
 import se.experis.MeFitBackend.model.Profile;
 import se.experis.MeFitBackend.model.Program;
 import se.experis.MeFitBackend.model.ProgramWorkout;
-import se.experis.MeFitBackend.repositories.ProfileRepository;
-import se.experis.MeFitBackend.repositories.ProgramRepository;
-import se.experis.MeFitBackend.repositories.ProgramWorkoutRepository;
-import se.experis.MeFitBackend.repositories.WorkoutRepository;
+import se.experis.MeFitBackend.repositories.*;
 
 import javax.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.NoSuchElementException;
 
 /*
     rjanul created on 2019-11-07
@@ -32,17 +30,29 @@ public class ProgramController {
     private final ProfileRepository profileRepository;
     private final ProgramWorkoutRepository programWorkoutRepository;
     private final WorkoutRepository workoutRepository;
+    private final ProgramGoalRepository programGoalRepository;
 
-    public ProgramController(ProgramRepository programRepository, ProfileRepository profileRepository, ProgramWorkoutRepository programWorkoutRepository, WorkoutRepository workoutRepository) {
+    public ProgramController(ProgramRepository programRepository, ProfileRepository profileRepository, ProgramWorkoutRepository programWorkoutRepository, WorkoutRepository workoutRepository, ProgramGoalRepository programGoalRepository) {
         this.programRepository = programRepository;
         this.profileRepository = profileRepository;
         this.programWorkoutRepository = programWorkoutRepository;
         this.workoutRepository = workoutRepository;
+        this.programGoalRepository = programGoalRepository;
     }
 
     @GetMapping("/program/{ID}")
     public ResponseEntity getGoal(@PathVariable int ID) {
-        return new ResponseEntity(programRepository.findById(ID), HttpStatus.ACCEPTED);
+        Program program;
+        try {
+            program = programRepository.findById(ID).get();
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(program, HttpStatus.ACCEPTED);
     }
 
     // TODO: Contributor only
@@ -53,7 +63,7 @@ public class ProgramController {
         HttpHeaders responseHeaders = new HttpHeaders();
 
         try {
-            Profile profile = profileRepository.getOne(params.get("profileId").intValue());
+            Profile profile = profileRepository.findById(params.get("profileId").intValue()).get();
 
             Program program = new Program(
                     params.get("name").asText(),
@@ -83,5 +93,64 @@ public class ProgramController {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(responseHeaders, HttpStatus.CREATED);
+    }
+
+    // TODO: Contributor only
+    @PatchMapping("program/{ID}")
+    @Transactional
+    public ResponseEntity patchProgram(@PathVariable int ID, @RequestBody ObjectNode params) {
+        try {
+            // check if there is a conflict (there are users using it)
+            if(programGoalRepository.findTopByProgramFk(programRepository.findById(ID).get()) != null) {
+                return new ResponseEntity(HttpStatus.CONFLICT);
+            } else {
+                // delete existing workouts
+                programWorkoutRepository.deleteByProgramFk(programRepository.findById(ID).get());
+
+                Profile profile = profileRepository.findById(params.get("profileId").intValue()).get();
+
+                Program program = programRepository.findById(ID).get();
+                program.setName(params.get("name").asText());
+                program.setCategory(params.get("category").asText());
+                program.setProfileFk(profile);
+                programRepository.save(program);
+
+                // connect program to workouts by making connection at programWorkout table
+                if (params.has("workoutId")) {
+                    for (int i = 0; i < params.get("workoutId").size(); i++) {
+                        ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutId").get(i).intValue()).get());
+                        programWorkoutRepository.save(pw);
+                    }
+                }
+            }
+        } catch (NoSuchElementException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    // TODO: Contributor only
+    @DeleteMapping("program/{ID}")
+    @Transactional
+    public ResponseEntity deleteProgram(@PathVariable int ID) {
+        try {
+            // check if program is connected to any goals if no delete
+            if(programGoalRepository.findTopByProgramFk(programRepository.findById(ID).get()) == null) {
+                programRepository.deleteById(ID);
+            } else {
+                return new ResponseEntity(HttpStatus.CONFLICT);
+            }
+        } catch (NoSuchElementException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

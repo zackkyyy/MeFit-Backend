@@ -27,7 +27,7 @@ public class Workout {
     @Column
     private String type;
 
-    @OneToMany
+    @OneToMany(orphanRemoval=true)
     @JsonManagedReference
     @JoinColumn(name = "workout_fk")
     private List<Set> set = new ArrayList<Set>();
@@ -69,5 +69,13 @@ public class Workout {
 
     public void setProfileFk(Profile profileFk) {
         this.profileFk = profileFk;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

@@ -49,10 +49,8 @@ public class GoalsController {
             goal = goalRepository.findById(ID).get();
         } catch (NoSuchElementException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(goal, HttpStatus.ACCEPTED);
     }
@@ -63,6 +61,10 @@ public class GoalsController {
         // profileId, achieved, endDate // list workoutId or/and list programId
         HttpHeaders responseHeaders = new HttpHeaders();
         try {
+            // check if profile exist
+            if(!profileRepository.existsById(params.get("profileId").intValue())) {
+                return new ResponseEntity(HttpStatus.NOT_FOUND);
+            }
             Profile profile = profileRepository.getOne(params.get("profileId").intValue());
 
             Goal goal = new Goal(
@@ -110,7 +112,7 @@ public class GoalsController {
         return new ResponseEntity(responseHeaders, HttpStatus.CREATED);
     }
 
-    // TODO: if user removes workout / program, how do i know which ones?
+    //
     @PatchMapping("goal/{ID}")
     @Transactional
     public ResponseEntity patchGoal(@PathVariable int ID, @RequestBody ObjectNode params) {
@@ -118,111 +120,64 @@ public class GoalsController {
         * achieved: "",
         * endDate: "",
         * profileId: "",
-        * workouts: [  // list of workouts
+        * workouts:
         *   {
         *       workoutId: "",
         *       completed: "",
-        *   }
-        * ],
-        * programs: [   // list of programs
+        *   },
+        * programs:
         *   {
         *       programId: "",
         *       completed: "",
-        *       workouts: [ // list of workouts inside program
+        *       workouts:
         *           {
         *               workoutId: "",
         *               completed: ""
         *           }
-        *       ]
+        *
         *   }
-        * ]
+        *
         *
         * */
         try {
-            Profile profile = profileRepository.getOne(params.get("profileId").intValue());
-            List<GoalWorkout> gwww = goalWorkoutRepository.findAllByGoalFk(goalRepository.getOne(ID));
+            Profile profile = profileRepository.findById(params.get("profileId").intValue()).get();
 
-            Goal goal = new Goal(
-                    ID,
-                    params.get("achieved").asBoolean(),
-                    new SimpleDateFormat("dd/MM/yyyy").parse(params.get("endDate").asText()),
-                    profile
-            );
+            Goal goal = goalRepository.findById(ID).get();
+            goal.setAchieved(params.get("achieved").asBoolean());
+            goal.setEndDate(new SimpleDateFormat("dd/MM/yyyy").parse(params.get("endDate").asText()));
+            goal.setProfileFk(profile);
             goalRepository.save(goal);
 
-            System.out.println("Goal saved ++++++++++++++++++++++=");
             // check if there is such element
-            // connect workouts to the goal
+            // update workout of the goal
             if (params.has("workouts")) {
-                for (int i = 0; i < params.get("workouts").size(); i++) {
-                    for (int j = 0; j < gwww.size(); j++) {
-                        // means a new workout added to goal
-                        if(gwww.get(j).getWorkoutFk().getWorkoutId() != params.get("workouts").get("workoutId").get(i).intValue()) {
-                            GoalWorkout gw = new GoalWorkout(false, goal, workoutRepository.getOne(params.get("workouts").get("workoutId").get(i).intValue()));
-                            goalWorkoutRepository.save(gw);
-                        }
-                        else {
-                            GoalWorkout gw = new GoalWorkout(
-                                    gwww.get(j).getGoalWorkoutId(),
-                                    params.get("workouts").get("completed").get(i).asBoolean(),
-                                    goal,
-                                    workoutRepository.getOne(params.get("workouts").get("workoutId").get(i).intValue())
-                            );
-                            goalWorkoutRepository.save(gw);
-                        }
-                    }
-                }
+                Workout workout = workoutRepository.findById(params.get("workouts").get("workoutId").intValue()).get();
+
+                GoalWorkout goalW = goalWorkoutRepository.findByGoalFkAndWorkoutFkAndProgramGoalFk(goal, workout, null);
+                goalW.setComplete(params.get("workouts").get("completed").asBoolean());
+                goalWorkoutRepository.save(goalW);
             }
 
-            System.out.println("goal workout doooooooone");
             // check if there is such element
-            // connect programs to the goal
+            // update program of the goal
             if (params.has("programs")) {
-                for (int i = 0; i < params.get("programs").size(); i++) {
-                    for (int j = 0; j < gwww.size(); j++) {
-                        // means a new program added to goal
-                        if(gwww.get(j).getProgramGoalFk().getProgramFk().getProgramId() != params.get("programs").get("programId").get(i).intValue()) {
-                            ProgramGoal pg = new ProgramGoal(false, goal, programRepository.getOne(params.get("programs").get("programId").get(i).intValue()));
-                            programGoalRepository.save(pg);
+                ProgramGoal programGoal = programGoalRepository.findTopByProgramFk(programRepository.findById(params.get("programs").get("programId").intValue()).get());
 
-                            // looping through program workout list to get workout entity
-                            for (int z = 0; z < pg.getProgramFk().getProgramWorkoutFk().size() ; z++) {
-                                GoalWorkout gw = new GoalWorkout(false, pg, pg.getProgramFk().getProgramWorkoutFk().get(i).getWorkoutFk());
-                                goalWorkoutRepository.save(gw);
-                            }
-                        }
-                        else {
-                            ProgramGoal pg = new ProgramGoal(
-                                    gwww.get(j).getProgramGoalFk().getProgramGoalId(),
-                                    params.get("programs").get("completed").get(i).asBoolean(),
-                                    goal,
-                                    programRepository.getOne(params.get("programs").get("programId").get(i).intValue())
-                            );
-                            programGoalRepository.save(pg);
+                programGoal.setComplete(params.get("programs").get("completed").asBoolean());
+                programGoalRepository.save(programGoal);
 
-                            // looping through program workout list to get workout entity
-                            for (int z = 0; z < params.get("programs").get("programsId").get(i).get("workouts").size(); z++) {
-                                GoalWorkout gw = new GoalWorkout(
-                                        gwww.get(z).getGoalWorkoutId(),
-                                        params.get("programs").get("programsId").get(i).get("workouts").get("completed").asBoolean(),
-                                        goal,
-                                        pg,
-                                        workoutRepository.getOne(params.get("programs").get("programsId").get(i).get("workouts").get("workoutId").intValue())
-                                );
-                                goalWorkoutRepository.save(gw);
-                            }
-                        }
-                    }
-                }
+                Workout workout = workoutRepository.findById(params.get("programs").get("workouts").get("workoutId").intValue()).get();
+
+                GoalWorkout goalW = goalWorkoutRepository.findByProgramGoalFkAndWorkoutFk(programGoal, workout);
+                goalW.setComplete(params.get("programs").get("workouts").get("completed").asBoolean());
+                goalWorkoutRepository.save(goalW);
             }
 
-            System.out.println("programmmm dooooooone");
         } catch (NoSuchElementException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            e.printStackTrace();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -236,9 +191,6 @@ public class GoalsController {
         } catch (NoSuchElementException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);

@@ -75,4 +75,23 @@ public class Exercise {
         return videoLink;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setTargetMuscle(String targetMuscle) {
+        this.targetMuscle = targetMuscle;
+    }
+
+    public void setImageLink(String imageLink) {
+        this.imageLink = imageLink;
+    }
+
+    public void setVideoLink(String videoLink) {
+        this.videoLink = videoLink;
+    }
 }

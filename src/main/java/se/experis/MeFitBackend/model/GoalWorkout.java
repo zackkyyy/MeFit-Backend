@@ -44,6 +44,13 @@ public class GoalWorkout {
         this.workoutFk = workoutFk;
     }
 
+    public GoalWorkout(boolean complete, Goal goalFk, ProgramGoal programGoalFk, Workout workoutFk) {
+        this.complete = complete;
+        this.goalFk = goalFk;
+        this.programGoalFk = programGoalFk;
+        this.workoutFk = workoutFk;
+    }
+
     public GoalWorkout(int goalWorkoutId, boolean complete, Goal goalFk, Workout workoutFk) {
         this.goalWorkoutId = goalWorkoutId;
         this.complete = complete;
@@ -84,5 +91,21 @@ public class GoalWorkout {
 
     public ProgramGoal getProgramGoalFk() {
         return programGoalFk;
+    }
+
+    public void setComplete(boolean complete) {
+        this.complete = complete;
+    }
+
+    public void setGoalFk(Goal goalFk) {
+        this.goalFk = goalFk;
+    }
+
+    public void setProgramGoalFk(ProgramGoal programGoalFk) {
+        this.programGoalFk = programGoalFk;
+    }
+
+    public void setWorkoutFk(Workout workoutFk) {
+        this.workoutFk = workoutFk;
     }
 }

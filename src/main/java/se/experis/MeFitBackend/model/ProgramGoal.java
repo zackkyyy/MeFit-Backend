@@ -69,4 +69,16 @@ public class ProgramGoal {
     public List<GoalWorkout> getGoalWorkoutFk() {
         return goalWorkoutFk;
     }
+
+    public void setComplete(boolean complete) {
+        this.complete = complete;
+    }
+
+    public void setProgramFk(Program programFk) {
+        this.programFk = programFk;
+    }
+
+    public void setGoalFk(Goal goalFk) {
+        this.goalFk = goalFk;
+    }
 }

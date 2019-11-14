@@ -1,8 +1,9 @@
 package se.experis.MeFitBackend.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import se.experis.MeFitBackend.model.GoalWorkout;
+import se.experis.MeFitBackend.model.Program;
 import se.experis.MeFitBackend.model.ProgramWorkout;
+import se.experis.MeFitBackend.model.Workout;
 
 /**
  * Author : Zacky Kharboutli
@@ -11,4 +12,6 @@ import se.experis.MeFitBackend.model.ProgramWorkout;
  */
 
 public interface ProgramWorkoutRepository extends JpaRepository<ProgramWorkout, Integer> {
+    Integer deleteByProgramFk(Program programFk);
+    ProgramWorkout findTopByWorkoutFk(Workout WorkoutFk);
 }

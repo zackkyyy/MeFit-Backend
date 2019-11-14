@@ -102,9 +102,9 @@
 //
 //        ProgramGoal programGoal = programGoalRepository.save(new ProgramGoal(false, goal, program));
 //
-//        GoalWorkout goalWorkout = goalWorkoutRepository.save(new GoalWorkout(false, programGoal, workout));
-//        GoalWorkout goalWorkout2 = goalWorkoutRepository.save(new GoalWorkout(false, programGoal, workout2));
-//        GoalWorkout goalWorkout3 = goalWorkoutRepository.save(new GoalWorkout(false, programGoal, workout3));
+//        GoalWorkout goalWorkout = goalWorkoutRepository.save(new GoalWorkout(false, goal, programGoal, workout));
+//        GoalWorkout goalWorkout2 = goalWorkoutRepository.save(new GoalWorkout(false, goal, programGoal, workout2));
+//        GoalWorkout goalWorkout3 = goalWorkoutRepository.save(new GoalWorkout(false, goal, programGoal, workout3));
 //
 //        GoalWorkout goalWorkout4 = goalWorkoutRepository.save(new GoalWorkout(false, goal2, workout));
 //        GoalWorkout goalWorkout5 = goalWorkoutRepository.save(new GoalWorkout(false, goal2, workout4));
