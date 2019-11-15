@@ -34,12 +34,10 @@ public class Profile {
     @Column
     private String fitnessLevel;
 
-    @OneToOne
-    @JoinColumn(name="end_user_fk")
-    private EndUser endUserFk;
+    @Column
+    private String userId;
 
     @OneToMany(orphanRemoval=true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="profile_fk")
     private List<Goal> goalFk = new ArrayList<Goal>();
 
@@ -68,12 +66,12 @@ public class Profile {
         this.fitnessLevel = fitnessLevel;
     }
 
-    public Profile(int weight, int height, int age, String fitnessLevel, EndUser endUserFk, Address addressFk) {
+    public Profile(int weight, int height, int age, String fitnessLevel, String userId, Address addressFk) {
         this.weight = weight;
         this.height = height;
         this.age = age;
         this.fitnessLevel = fitnessLevel;
-        this.endUserFk = endUserFk;
+        this.userId = userId;
         this.addressFk = addressFk;
     }
 
@@ -97,8 +95,8 @@ public class Profile {
         return fitnessLevel;
     }
 
-    public EndUser getEndUserFk() {
-        return endUserFk;
+    public String getUserId() {
+        return userId;
     }
 
     public Address getAddressFk() {
@@ -115,5 +113,29 @@ public class Profile {
 
     public List<Program> getProgramFk() {
         return programFk;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void setFitnessLevel(String fitnessLevel) {
+        this.fitnessLevel = fitnessLevel;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public void setAddressFk(Address addressFk) {
+        this.addressFk = addressFk;
     }
 }

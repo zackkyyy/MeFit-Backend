@@ -29,15 +29,13 @@ public class ProfileController {
 
     @Autowired
     private final AddressRepository addressRepository;
-    private final EndUserRepository endUserRepository;
     private final ProfileRepository profileRepository;
     private final ProgramRepository programRepository;
     private final WorkoutRepository workoutRepository;
 
 
-    public ProfileController(AddressRepository addressRepository, EndUserRepository endUserRepository, ProfileRepository profileRepository, ProgramRepository programRepository, WorkoutRepository workoutRepository) {
+    public ProfileController(AddressRepository addressRepository, ProfileRepository profileRepository, ProgramRepository programRepository, WorkoutRepository workoutRepository) {
         this.addressRepository = addressRepository;
-        this.endUserRepository = endUserRepository;
         this.profileRepository = profileRepository;
         this.programRepository = programRepository;
         this.workoutRepository = workoutRepository;
@@ -47,26 +45,21 @@ public class ProfileController {
     @Transactional
     public ResponseEntity createProfile(@RequestBody ObjectNode params){
         HttpHeaders responseHeaders = new HttpHeaders();
-
         try {
-            // It supposed to be transaction, add all or nothing at all
             Address address = new Address(
                     params.get("street").asText(),
                     params.get("city").asText(),
                     params.get("country").asText(),
                     params.get("postalCode").intValue()
             );
-
             addressRepository.save(address);
-
-            EndUser user = endUserRepository.getOne(params.get("userId").intValue());
 
             Profile profile = new Profile(
                     params.get("weight").intValue(),
                     params.get("height").intValue(),
                     params.get("age").intValue(),
                     params.get("fitnessLevel").asText(),
-                    user,
+                    params.get("userId").asText(),
                     address
             );
             profileRepository.save(profile);
@@ -104,26 +97,25 @@ public class ProfileController {
     @PatchMapping("/profile/{ID}")
     @Transactional
     public ResponseEntity patchProfile(@PathVariable int ID, @RequestBody ObjectNode params) {
-        // height / weight / age / fitnessLevel
-        // street / city / country / postalCode
         try {
-            Profile prof = new Profile(
-                    profileRepository.getOne(ID).getProfileId(),
-                    params.get("height").intValue(),
-                    params.get("weight").intValue(),
-                    params.get("age").intValue(),
-                    params.get("fitnessLevel").asText()
-            );
+            Profile prof = profileRepository.findById(ID).get();
+            // user tries to update not his profile
+            if(prof.getUserId() != params.get("userId").asText()) {
+                return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            }
+            prof.setHeight(params.get("height").intValue());
+            prof.setWeight(params.get("weight").intValue());
+            prof.setAge(params.get("age").intValue());
+            prof.setFitnessLevel(params.get("fitnessLevel").asText());
             profileRepository.save(prof);
 
-            Address addr = new Address(
-                    profileRepository.getOne(ID).getAddressFk().getAddressId(),
-                    params.get("street").asText(),
-                    params.get("city").asText(),
-                    params.get("country").asText(),
-                    params.get("postalCode").intValue()
-            );
+            Address addr = profileRepository.getOne(ID).getAddressFk();
+            addr.setStreet(params.get("street").asText());
+            addr.setCity(params.get("city").asText());
+            addr.setCountry(params.get("country").asText());
+            addr.setPostalCode(params.get("postalCode").intValue());
             addressRepository.save(addr);
+
         } catch (NoSuchElementException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -140,11 +132,9 @@ public class ProfileController {
     @DeleteMapping("profile/{ID}")
     @Transactional
     public ResponseEntity deleteProfile(@PathVariable int ID) {
-        // Deleting a profile will delete everything connected to the user except user itself
-        // address / program_goal / goal / goal_workout
         // if contributor it will change foreign keys for program / workout to null
         try {
-            int addressId = profileRepository.getOne(ID).getAddressFk().getAddressId();
+            int addressId = profileRepository.findById(ID).get().getAddressFk().getAddressId();
             // If address row is connected to only one row, delete it, otherwise do not
             if(profileRepository.findAllByAddressFk(addressId).size() == 1) {
                 addressRepository.deleteById(addressId);

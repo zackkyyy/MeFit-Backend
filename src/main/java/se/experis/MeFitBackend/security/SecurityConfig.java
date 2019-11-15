@@ -31,17 +31,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private String apiAudience;
     @Value("${auth0.issuer}")
     private String issuer;
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));  // to be changed to the app URL
-        configuration.setAllowedMethods(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
-        configuration.addAllowedHeader("*");
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+//    @Bean
+//    CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));  // to be changed to the app URL
+//        configuration.setAllowedMethods(Arrays.asList("*"));
+//        configuration.setAllowCredentials(true);
+//        configuration.addAllowedHeader("*");
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

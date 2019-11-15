@@ -45,7 +45,7 @@ public class ExerciseController {
         try {
             Exercise ex = exerciseRepository.save(exercise);
 
-            responseHeaders.setLocation(new URI(rootURL + "exercise/" + ex.getExerciseId()));
+            responseHeaders.setLocation(new URI(rootURL + "exercises/" + ex.getExerciseId()));
         } catch (MappingException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (URISyntaxException e) {
@@ -82,7 +82,7 @@ public class ExerciseController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(ex, HttpStatus.ACCEPTED);
     }
