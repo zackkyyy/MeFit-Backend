@@ -110,7 +110,16 @@ public class ProfileController {
             prof.setFitnessLevel(params.get("fitnessLevel").asText());
             profileRepository.save(prof);
 
-            Address addr = profileRepository.getOne(ID).getAddressFk();
+            Address addr;
+            // address row, so retrieve it
+            if(prof.getAddressFk() != null) {
+                addr = addressRepository.findById(prof.getAddressFk().getAddressId()).get();
+            }
+            // address does not exist, create new
+            else {
+                addr = new Address();
+            }
+            // set address details
             addr.setStreet(params.get("street").asText());
             addr.setCity(params.get("city").asText());
             addr.setCountry(params.get("country").asText());
