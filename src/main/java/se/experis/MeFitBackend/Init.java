@@ -23,7 +23,6 @@
 //    private final ProgramRepository programRepository;
 //    private final ProgramWorkoutRepository programWorkoutRepository;
 //    private final AddressRepository addressRepository;
-//    private final EndUserRepository endUserRepository;
 //    private final ExerciseRepository exerciseRepository;
 //    private final SetRepository setRepository;
 //
@@ -35,7 +34,6 @@
 //                ProgramRepository programRepository,
 //                ProgramWorkoutRepository programWorkoutRepository,
 //                AddressRepository addressRepository,
-//                EndUserRepository endUserRepository,
 //                ExerciseRepository exerciseRepository,
 //                SetRepository setRepository)
 //    {
@@ -47,7 +45,6 @@
 //        this.programRepository = programRepository;
 //        this.programWorkoutRepository = programWorkoutRepository;
 //        this.addressRepository = addressRepository;
-//        this.endUserRepository = endUserRepository;
 //        this.exerciseRepository = exerciseRepository;
 //        this.setRepository = setRepository;
 //    }
@@ -59,11 +56,8 @@
 //        Address adr2 = addressRepository.save(new Address("Street", "City", "Country", 9999));
 //        Address adr3 = addressRepository.save(new Address("Street", "City", "Country", 9999));
 //
-//        EndUser usr = endUserRepository.save(new EndUser("Firstname", "Lastname", "password", "email@email"));
-//        EndUser usr2 = endUserRepository.save(new EndUser("Firstname2", "Lastname2", "password2", "email2@email"));
-//
-//        Profile prof = profileRepository.save(new Profile(100, 180, 30, "Begginer", usr, adr));
-//        Profile prof2 = profileRepository.save(new Profile(100, 180, 30, "Begginer", usr2, adr2));
+//        Profile prof = profileRepository.save(new Profile(100, 180, 30, "Begginer", "213213sad", adr));
+//        Profile prof2 = profileRepository.save(new Profile(100, 180, 30, "Begginer", "sadsad123", adr2));
 //
 //        Exercise ex = exerciseRepository.save(new Exercise("name", "description", "targetMuslce", "imageLink", "videoLink"));
 //        Exercise ex2 = exerciseRepository.save(new Exercise("name", "description", "targetMuslce", "imageLink", "videoLink"));

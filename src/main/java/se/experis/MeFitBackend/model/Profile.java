@@ -34,7 +34,7 @@ public class Profile {
     @Column
     private String fitnessLevel;
 
-    @Column
+    @Column(unique=true, nullable=false)
     private String userId;
 
     @OneToMany(orphanRemoval=true)
