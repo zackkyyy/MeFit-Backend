@@ -13,4 +13,5 @@ import java.util.List;
 
 public interface ProfileRepository extends JpaRepository<Profile, Integer> {
     List<Profile> findAllByAddressFk(int addressFk);
+    Profile findByUserId(String userId);
 }
