@@ -46,22 +46,8 @@ public class ProfileController {
     public ResponseEntity createProfile(@RequestBody ObjectNode params){
         HttpHeaders responseHeaders = new HttpHeaders();
         try {
-            Address address = new Address(
-                    params.get("street").asText(),
-                    params.get("city").asText(),
-                    params.get("country").asText(),
-                    params.get("postalCode").intValue()
-            );
-            addressRepository.save(address);
-
-            Profile profile = new Profile(
-                    params.get("weight").intValue(),
-                    params.get("height").intValue(),
-                    params.get("age").intValue(),
-                    params.get("fitnessLevel").asText(),
-                    params.get("userId").asText(),
-                    address
-            );
+            Profile profile = new Profile();
+            profile.setUserId(params.get("userId").asText());
             profileRepository.save(profile);
 
             responseHeaders.setLocation(new URI(rootURL + "profile/" + profile.getProfileId()));
