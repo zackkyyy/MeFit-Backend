@@ -17,6 +17,7 @@ import se.experis.MeFitBackend.repositories.*;
 import javax.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /*
@@ -52,6 +53,22 @@ public class WorkoutController {
             workout = workoutRepository.findById(ID).get();
         } catch (NoSuchElementException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(workout, HttpStatus.ACCEPTED);
+    }
+
+    // Returns a list of workouts
+    @GetMapping("/workout")
+    public ResponseEntity getWorkoutList(){
+        List<Workout> workout;
+        try {
+            workout = workoutRepository.findAll();
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
