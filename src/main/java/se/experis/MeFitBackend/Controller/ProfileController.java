@@ -94,6 +94,21 @@ public class ProfileController {
         return new ResponseEntity(prof, HttpStatus.ACCEPTED);
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity getAllProfiles(){
+        List<Profile> prof;
+        try {
+            prof = profileRepository.findAll();
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(prof, HttpStatus.ACCEPTED);
+    }
+
     // TODO: check if user is updating his profile and not someone else
     @PatchMapping("/profile/{ID}")
     @Transactional
