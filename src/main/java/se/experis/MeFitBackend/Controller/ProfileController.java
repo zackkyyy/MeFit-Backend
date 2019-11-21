@@ -48,6 +48,7 @@ public class ProfileController {
         try {
             Profile profile = new Profile();
             profile.setUserId(params.get("userId").asText());
+            profile.setRole(1);
             profileRepository.save(profile);
 
             responseHeaders.setLocation(new URI(rootURL + "profile/" + profile.getProfileId()));
@@ -84,6 +85,9 @@ public class ProfileController {
         Profile prof;
         try {
             prof = profileRepository.findByUserId(ID);
+            if(prof == null) {
+                throw new NoSuchElementException();
+            }
         } catch (NoSuchElementException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException e) {
@@ -99,8 +103,7 @@ public class ProfileController {
         List<Profile> prof;
         try {
             prof = profileRepository.findAll();
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+
         } catch (IllegalArgumentException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
@@ -116,11 +119,11 @@ public class ProfileController {
         try {
             Profile prof = profileRepository.findById(ID).get();
             // user tries to update not his profile
-            if(prof.getUserId() != params.get("userId").asText()) {
+            if(prof.getUserId().equals(params.get("userId").asText())) {
                 return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             }
-            prof.setHeight(params.get("height").intValue());
-            prof.setWeight(params.get("weight").intValue());
+            prof.setHeight(params.get("height").asInt());
+            prof.setWeight(params.get("weight").asInt());
             prof.setAge(params.get("age").intValue());
             prof.setFitnessLevel(params.get("fitnessLevel").asText());
             profileRepository.save(prof);
@@ -140,6 +143,30 @@ public class ProfileController {
             addr.setCountry(params.get("country").asText());
             addr.setPostalCode(params.get("postalCode").intValue());
             addressRepository.save(addr);
+
+        } catch (NoSuchElementException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    // TODO: only admin
+    // testing
+    @PatchMapping("/profile/role/user/{ID}")
+    @Transactional
+    public ResponseEntity patchProfileRole(@PathVariable int ID, @RequestBody Profile profile) {
+        try {
+            if(profile.getRole() > 3) {
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            } else {
+                Profile prof = profileRepository.findById(ID).get();
+                prof.setRole(profile.getRole());
+                profileRepository.save(prof);
+            }
 
         } catch (NoSuchElementException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

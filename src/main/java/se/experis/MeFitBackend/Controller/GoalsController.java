@@ -58,6 +58,38 @@ public class GoalsController {
         return new ResponseEntity(goal, HttpStatus.ACCEPTED);
     }
 
+    @GetMapping("/goal/status/user/{ID}")
+    public ResponseEntity getNotAchievedGoal(@PathVariable int ID){
+        Goal gl;
+        try {
+            gl = goalRepository.findByProfileFkAndAchieved(profileRepository.findById(ID).get(), false);
+            if(gl == null) {
+                throw new NoSuchElementException();
+            }
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(gl, HttpStatus.ACCEPTED);
+    }
+
+    @PatchMapping("/goal/workout/{ID}")
+    public ResponseEntity patchGoalWorkout(@PathVariable int ID){
+        // goalWorkoutId, complete
+        GoalWorkout gw;
+        try {
+            gw = goalWorkoutRepository.findById(ID).get();
+            gw.setComplete(true);
+            goalWorkoutRepository.save(gw);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
     @PostMapping("/addGoal")
     @Transactional
     public ResponseEntity addGoal(@RequestBody ObjectNode params) throws ParseException {

@@ -34,6 +34,9 @@ public class Profile {
     @Column
     private String fitnessLevel;
 
+    @Column
+    private int role;
+
     @Column(unique=true, nullable=false)
     private String userId;
 
@@ -137,5 +140,13 @@ public class Profile {
 
     public void setAddressFk(Address addressFk) {
         this.addressFk = addressFk;
+    }
+
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
     }
 }

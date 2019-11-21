@@ -83,11 +83,10 @@ public class WorkoutController {
         HttpHeaders responseHeaders = new HttpHeaders();
         Workout wrk;
         try {
-           // Profile profile = profileRepository.getOne(params.get("profileId").intValue());
             wrk = workoutRepository.save(new Workout(
                     params.get("name").asText(),
                     params.get("type").asText(),
-                    profileRepository.getOne(1)
+                    profileRepository.findById(params.get("profileId").asInt()).get()
             ));
             workoutRepository.save(wrk);
 

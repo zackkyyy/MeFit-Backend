@@ -17,6 +17,7 @@ import se.experis.MeFitBackend.repositories.*;
 import javax.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /*
@@ -44,7 +45,7 @@ public class ProgramController {
     }
 
     @GetMapping("/program/{ID}")
-    public ResponseEntity getGoal(@PathVariable int ID) {
+    public ResponseEntity getProgram(@PathVariable int ID) {
         Program program;
         try {
             program = programRepository.findById(ID).get();
@@ -58,10 +59,24 @@ public class ProgramController {
         return new ResponseEntity(program, HttpStatus.ACCEPTED);
     }
 
+    @GetMapping("/program")
+    public ResponseEntity getProgram() {
+        List<Program> program;
+        try {
+            program = programRepository.findAll();
+
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(program, HttpStatus.ACCEPTED);
+    }
+
     // TODO: Contributor only
     @PostMapping("/addProgram")
     @Transactional
-    public ResponseEntity addGoal(@RequestBody ObjectNode params) {
+    public ResponseEntity addProgram(@RequestBody ObjectNode params) {
         // name, category, profileId (who creates it), list of workoutId
         HttpHeaders responseHeaders = new HttpHeaders();
 
@@ -76,9 +91,9 @@ public class ProgramController {
             programRepository.save(program);
 
             // connect program to workouts by making connection at programWorkout table
-            if (params.has("workoutId")) {
-                for (int i = 0; i < params.get("workoutId").size(); i++) {
-                    ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutId").get(i).intValue()).get());
+            if (params.has("workoutList")) {
+                for (int i = 0; i < params.get("workoutList").size(); i++) {
+                    ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").intValue()).get());
                     programWorkoutRepository.save(pw);
                 }
             }

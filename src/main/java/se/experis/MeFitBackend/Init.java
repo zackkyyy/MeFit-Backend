@@ -52,22 +52,22 @@
 //    @PostConstruct
 //    private void init() {
 //
-//        Address adr = addressRepository.save(new Address("Street", "City", "Country", 9999));
-//        Address adr2 = addressRepository.save(new Address("Street", "City", "Country", 9999));
-//        Address adr3 = addressRepository.save(new Address("Street", "City", "Country", 9999));
+//        Address adr = addressRepository.save(new Address("Street1", "City1", "Country1", 9999));
+//        Address adr2 = addressRepository.save(new Address("Street2", "City2", "Country2", 9999));
+//        Address adr3 = addressRepository.save(new Address("Street3", "City3", "Country3", 9999));
 //
 //        Profile prof = profileRepository.save(new Profile(100, 180, 30, "Begginer", "213213sad", adr));
 //        Profile prof2 = profileRepository.save(new Profile(100, 180, 30, "Begginer", "sadsad123", adr2));
 //
-//        Exercise ex = exerciseRepository.save(new Exercise("name", "description", "targetMuslce", "imageLink", "videoLink"));
-//        Exercise ex2 = exerciseRepository.save(new Exercise("name", "description", "targetMuslce", "imageLink", "videoLink"));
-//        Exercise ex3 = exerciseRepository.save(new Exercise("name", "description", "targetMuslce", "imageLink", "videoLink"));
-//        Exercise ex4 = exerciseRepository.save(new Exercise("name", "description", "targetMuslce", "imageLink", "videoLink"));
+//        Exercise ex = exerciseRepository.save(new Exercise("name1", "description1", "targetMuslce1", "imageLink", "videoLink"));
+//        Exercise ex2 = exerciseRepository.save(new Exercise("name2", "description2", "targetMuslce2", "imageLink", "videoLink"));
+//        Exercise ex3 = exerciseRepository.save(new Exercise("name3", "description3", "targetMuslce3", "imageLink", "videoLink"));
+//        Exercise ex4 = exerciseRepository.save(new Exercise("name4", "description4", "targetMuslce4", "imageLink", "videoLink"));
 //
-//        Workout workout = workoutRepository.save(new Workout("name", "type", prof));
-//        Workout workout2 = workoutRepository.save(new Workout("name", "type", prof2));
-//        Workout workout3 = workoutRepository.save(new Workout("name", "type", null));
-//        Workout workout4 = workoutRepository.save(new Workout("name", "type", null));
+//        Workout workout = workoutRepository.save(new Workout("name1", "type1", prof));
+//        Workout workout2 = workoutRepository.save(new Workout("name2", "type2", prof2));
+//        Workout workout3 = workoutRepository.save(new Workout("name3", "type3", null));
+//        Workout workout4 = workoutRepository.save(new Workout("name4", "type4", null));
 //
 //
 //
@@ -80,8 +80,8 @@
 //        Set set7 = setRepository.save(new Set(10, 3, ex, workout4));
 //
 //
-//        Program program = programRepository.save(new Program("name", "category", prof));
-//        Program program2 = programRepository.save(new Program("name", "category", prof));
+//        Program program = programRepository.save(new Program("name1", "category1", prof));
+//        Program program2 = programRepository.save(new Program("name2", "category2", prof));
 //
 //        ProgramWorkout programWorkout = programWorkoutRepository.save(new ProgramWorkout(program, workout));
 //        ProgramWorkout programWorkout2 = programWorkoutRepository.save(new ProgramWorkout(program, workout2));
