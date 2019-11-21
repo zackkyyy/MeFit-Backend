@@ -157,15 +157,20 @@ public class ProfileController {
     // TODO: only admin
     // testing
     @PatchMapping("/profile/role/user/{ID}")
-    @Transactional
     public ResponseEntity patchProfileRole(@PathVariable int ID, @RequestBody Profile profile) {
+        System.out.println(profile);
         try {
             if(profile.getRole() > 3) {
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
             } else {
+                System.out.println("here0");
+
                 Profile prof = profileRepository.findById(ID).get();
+                System.out.println(prof);
                 prof.setRole(profile.getRole());
+                System.out.println(prof);
                 profileRepository.save(prof);
+                System.out.println("here");
             }
 
         } catch (NoSuchElementException e) {
