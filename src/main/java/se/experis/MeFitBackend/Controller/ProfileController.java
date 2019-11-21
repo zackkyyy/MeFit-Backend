@@ -157,27 +157,20 @@ public class ProfileController {
     // TODO: only admin
     // testing
     @PatchMapping("/profile/role/user/{ID}")
-    public ResponseEntity patchProfileRole(@PathVariable int ID, @RequestBody Profile profile) {
-        System.out.println(profile);
+    public ResponseEntity patchProfileRole(@PathVariable int ID, @RequestBody ObjectNode params) {
         try {
-            if(profile.getRole() > 3) {
+            if(params.get("role").asInt() > 3) {
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
-            } else {
-                System.out.println("here0");
-
+            } else if (params.has("role")) {
                 Profile prof = profileRepository.findById(ID).get();
-                System.out.println(prof);
-                prof.setRole(profile.getRole());
-                System.out.println(prof);
+                prof.setRole(params.get("role").asInt());
                 profileRepository.save(prof);
-                System.out.println("here");
+            } else {
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
-
         } catch (NoSuchElementException e) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.NO_CONTENT);
