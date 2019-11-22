@@ -80,10 +80,15 @@ public class WorkoutController {
     public ResponseEntity getUserWorkoutList(@PathVariable int ID){
         List<Workout> workout;
         try {
-            workout = workoutRepository.findAllByProfileFk(ID);
+            workout = workoutRepository.findAllByProfileFk(profileRepository.findById(ID).get());
+        } catch (NoSuchElementException e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(workout, HttpStatus.ACCEPTED);

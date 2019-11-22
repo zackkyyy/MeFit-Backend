@@ -190,14 +190,14 @@ public class ProfileController {
                 addressRepository.deleteById(addressId);
             }
             // if contributor, change foreign key to null for program
-            List<Program> programList = programRepository.findAllByProfileFk(ID);
+            List<Program> programList = programRepository.findAllByProfileFk(profileRepository.findById(ID).get());
             for(int i = 0; i < programList.size(); i++) {
                 Program prg = programRepository.getOne(programList.get(i).getProgramId());
                 prg.setProfileFk(null);
                 programRepository.save(prg);
             }
             // if contributor, change foreign key to null for workout
-            List<Workout> workoutList = workoutRepository.findAllByProfileFk(ID);
+            List<Workout> workoutList = workoutRepository.findAllByProfileFk(profileRepository.findById(ID).get());
             for(int i = 0; i < programList.size(); i++) {
                 Workout wrk = workoutRepository.getOne(workoutList.get(i).getWorkoutId());
                 wrk.setProfileFk(null);

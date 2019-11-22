@@ -77,7 +77,9 @@ public class ProgramController {
     public ResponseEntity getUserProgramList(@PathVariable int ID) {
         List<Program> program;
         try {
-            program = programRepository.findAllByProfileFk(ID);
+            program = programRepository.findAllByProfileFk(profileRepository.findById(ID).get());
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
