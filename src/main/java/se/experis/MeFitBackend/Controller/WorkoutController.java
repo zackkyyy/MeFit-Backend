@@ -75,6 +75,20 @@ public class WorkoutController {
         return new ResponseEntity(workout, HttpStatus.ACCEPTED);
     }
 
+    // Returns user's workouts
+    @GetMapping("/workout/user/{ID}")
+    public ResponseEntity getUserWorkoutList(@PathVariable int ID){
+        List<Workout> workout;
+        try {
+            workout = workoutRepository.findAllByProfileFk(ID);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(workout, HttpStatus.ACCEPTED);
+    }
+
     // TODO: Contributor only
     // set profile from params
     @PostMapping(value = "/addWorkout")

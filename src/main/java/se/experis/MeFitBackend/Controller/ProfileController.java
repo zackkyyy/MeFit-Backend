@@ -119,7 +119,7 @@ public class ProfileController {
         try {
             Profile prof = profileRepository.findById(ID).get();
             // user tries to update not his profile
-            if(prof.getUserId().equals(params.get("userId").asText())) {
+            if(!prof.getUserId().equals(params.get("userId").asText())) {
                 return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             }
             prof.setHeight(params.get("height").asInt());

@@ -49,8 +49,21 @@ public class ProgramController {
         Program program;
         try {
             program = programRepository.findById(ID).get();
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (NoSuchElementException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(program, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/program")
+    public ResponseEntity getProgramList() {
+        List<Program> program;
+        try {
+            program = programRepository.findAll();
         } catch (IllegalArgumentException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
@@ -59,12 +72,12 @@ public class ProgramController {
         return new ResponseEntity(program, HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("/program")
-    public ResponseEntity getProgram() {
+    // returns user's program list
+    @GetMapping("/program/user/{ID}")
+    public ResponseEntity getUserProgramList(@PathVariable int ID) {
         List<Program> program;
         try {
-            program = programRepository.findAll();
-
+            program = programRepository.findAllByProfileFk(ID);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
