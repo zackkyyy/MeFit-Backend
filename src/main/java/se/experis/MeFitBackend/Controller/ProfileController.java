@@ -124,7 +124,7 @@ public class ProfileController {
             }
             prof.setHeight(params.get("height").asInt());
             prof.setWeight(params.get("weight").asInt());
-            prof.setAge(params.get("age").intValue());
+            prof.setAge(params.get("age").asInt());
             prof.setFitnessLevel(params.get("fitnessLevel").asText());
             profileRepository.save(prof);
 
@@ -141,7 +141,7 @@ public class ProfileController {
             addr.setStreet(params.get("street").asText());
             addr.setCity(params.get("city").asText());
             addr.setCountry(params.get("country").asText());
-            addr.setPostalCode(params.get("postalCode").intValue());
+            addr.setPostalCode(params.get("postalCode").asInt());
             addressRepository.save(addr);
 
         } catch (NoSuchElementException e) {

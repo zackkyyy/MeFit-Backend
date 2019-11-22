@@ -52,11 +52,9 @@ public class Profile {
     @JoinColumn(name="profile_fk")
     private List<Workout> workoutFk = new ArrayList<Workout>();
 
-    @ManyToOne
-    @JsonBackReference
+    @OneToOne
     @JoinColumn(name="address_fk")
     private Address addressFk;
-
 
     public Profile() {
     }

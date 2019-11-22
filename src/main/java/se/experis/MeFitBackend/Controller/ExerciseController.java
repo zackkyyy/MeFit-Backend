@@ -66,7 +66,7 @@ public class ExerciseController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(ex, HttpStatus.ACCEPTED);
     }
@@ -107,13 +107,11 @@ public class ExerciseController {
 
                 exerciseRepository.save(ex);
             }
-
         } catch (NoSuchElementException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -135,39 +133,5 @@ public class ExerciseController {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.NO_CONTENT);
-    }
-
-    @PostMapping("/addSet")
-    public ResponseEntity addSet(@RequestBody Set set) {
-        HttpHeaders responseHeaders = new HttpHeaders();
-
-        try {
-            Set ss = setRepository.save(set);
-
-            URI location = new URI(rootURL + "set/" + ss.getSetId());
-            responseHeaders.setLocation(location);
-        } catch (MappingException e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        } catch (URISyntaxException e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity(set, HttpStatus.CREATED);
-    }
-
-    @GetMapping("/set/{ID}")
-    public ResponseEntity getSet(@PathVariable int ID){
-        Set set;
-        try {
-            set = setRepository.findById(ID).get();
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity(set, HttpStatus.ACCEPTED);
     }
 }

@@ -32,11 +32,6 @@ public class Address {
     @Column
     private int postalCode;
 
-    @OneToMany
-    @JsonManagedReference
-    @JoinColumn(name="address_fk")
-    private List<Profile> profileFk = new ArrayList<Profile>();
-
     public Address() {
     }
 
@@ -73,10 +68,6 @@ public class Address {
 
     public int getPostalCode() {
         return postalCode;
-    }
-
-    public List<Profile> getProfileFk() {
-        return profileFk;
     }
 
     public void setStreet(String street) {

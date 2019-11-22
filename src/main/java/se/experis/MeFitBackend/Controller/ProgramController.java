@@ -94,7 +94,6 @@ public class ProgramController {
     public ResponseEntity addProgram(@RequestBody ObjectNode params) {
         // name, category, profileId (who creates it), list of workoutId
         HttpHeaders responseHeaders = new HttpHeaders();
-
         try {
             Profile profile = profileRepository.findById(params.get("profileId").intValue()).get();
 
@@ -112,7 +111,6 @@ public class ProgramController {
                     programWorkoutRepository.save(pw);
                 }
             }
-
             responseHeaders.setLocation(new URI(rootURL + "program/" + program.getProgramId()));
 
         } catch (MappingException e) {
@@ -149,9 +147,9 @@ public class ProgramController {
                 programRepository.save(program);
 
                 // connect program to workouts by making connection at programWorkout table
-                if (params.has("workoutId")) {
-                    for (int i = 0; i < params.get("workoutId").size(); i++) {
-                        ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutId").get(i).intValue()).get());
+                if (params.has("workoutList")) {
+                    for (int i = 0; i < params.get("workoutList").size(); i++) {
+                        ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").intValue()).get());
                         programWorkoutRepository.save(pw);
                     }
                 }

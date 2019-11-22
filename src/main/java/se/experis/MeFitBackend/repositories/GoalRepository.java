@@ -5,6 +5,8 @@ import se.experis.MeFitBackend.model.Address;
 import se.experis.MeFitBackend.model.Goal;
 import se.experis.MeFitBackend.model.Profile;
 
+import java.util.List;
+
 /**
  * Author : Zacky Kharboutli
  * Date : 2019-11-06
@@ -12,5 +14,5 @@ import se.experis.MeFitBackend.model.Profile;
  */
 
 public interface GoalRepository extends JpaRepository<Goal, Integer> {
-    Goal findByProfileFkAndAchieved(Profile profileFk, boolean achieved);
+    List<Goal> findByProfileFkAndAchieved(Profile profileFk, boolean achieved);
 }

@@ -59,12 +59,28 @@ public class GoalsController {
     }
 
     @GetMapping("/goal/status/user/{ID}")
-    public ResponseEntity getNotAchievedGoal(@PathVariable int ID){
-        Goal gl;
+    public ResponseEntity getUnachievedGoals(@PathVariable int ID){
+        List<Goal> gl;
         try {
             gl = goalRepository.findByProfileFkAndAchieved(profileRepository.findById(ID).get(), false);
             if(gl == null) {
-                throw new NoSuchElementException();
+                return new ResponseEntity(HttpStatus.NOT_FOUND);
+            }
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(gl, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/goal/history/user/{ID}")
+    public ResponseEntity getAchievedGoals(@PathVariable int ID){
+        List<Goal> gl;
+        try {
+            gl = goalRepository.findByProfileFkAndAchieved(profileRepository.findById(ID).get(), true);
+            if(gl == null) {
+                return new ResponseEntity(HttpStatus.NOT_FOUND);
             }
         } catch (NoSuchElementException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -82,6 +98,22 @@ public class GoalsController {
             gw = goalWorkoutRepository.findById(ID).get();
             gw.setComplete(true);
             goalWorkoutRepository.save(gw);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
+    @PatchMapping("/goal/program/{ID}")
+    public ResponseEntity patchGoalProgram(@PathVariable int ID){
+        // goalWorkoutId, complete
+        ProgramGoal pg;
+        try {
+            pg = programGoalRepository.findById(ID).get();
+            pg.setComplete(true);
+            programGoalRepository.save(pg);
         } catch (NoSuchElementException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -147,7 +179,7 @@ public class GoalsController {
         return new ResponseEntity(responseHeaders, HttpStatus.CREATED);
     }
 
-    //
+    // TODO: more testing needed
     @PatchMapping("goal/{ID}")
     @Transactional
     public ResponseEntity patchGoal(@PathVariable int ID, @RequestBody ObjectNode params) {
@@ -178,9 +210,12 @@ public class GoalsController {
             Profile profile = profileRepository.findById(params.get("profileId").intValue()).get();
 
             Goal goal = goalRepository.findById(ID).get();
-            goal.setAchieved(params.get("achieved").asBoolean());
-            goal.setEndDate(new SimpleDateFormat("dd/MM/yyyy").parse(params.get("endDate").asText()));
-            goal.setProfileFk(profile);
+            if(params.has("achieved")) {
+                goal.setAchieved(params.get("achieved").asBoolean());
+            }
+            if(params.has("endDate")) {
+                goal.setEndDate(new SimpleDateFormat("dd/MM/yyyy").parse(params.get("endDate").asText()));
+            }
             goalRepository.save(goal);
 
             // check if there is such element
