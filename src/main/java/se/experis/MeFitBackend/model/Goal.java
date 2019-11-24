@@ -26,6 +26,9 @@ public class Goal {
     private Boolean achieved;
 
     @Column
+    private Date startDate;
+
+    @Column
     private Date endDate;
 
     @ManyToOne
@@ -41,8 +44,9 @@ public class Goal {
     @JoinColumn(name="goal_fk")
     private List<ProgramGoal> programGoalFk = new ArrayList<ProgramGoal>();
 
-    public Goal(Boolean achieved, Date endDate, Profile profileFk) {
+    public Goal(Boolean achieved, Date startDate, Date endDate, Profile profileFk) {
         this.achieved = achieved;
+        this.startDate = startDate;
         this.endDate = endDate;
         this.profileFk = profileFk;
     }
@@ -63,6 +67,10 @@ public class Goal {
 
     public Boolean getAchieved() {
         return achieved;
+    }
+
+    public Date getStartDate() {
+        return startDate;
     }
 
     public Date getEndDate() {
@@ -87,6 +95,10 @@ public class Goal {
 
     public void setAchieved(Boolean achieved) {
         this.achieved = achieved;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
     public void setEndDate(Date endDate) {

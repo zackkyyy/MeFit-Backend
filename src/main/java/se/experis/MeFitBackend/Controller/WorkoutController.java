@@ -109,9 +109,9 @@ public class WorkoutController {
             // loop through set (exercise) list
             for (int i = 0; i < params.get("exercises").size(); i++) {
                 setRepository.save(new Set(
-                        params.get("exercises").get(i).get("reps").intValue(),
-                        params.get("exercises").get(i).get("sets").intValue(),
-                        exerciseRepository.getOne(params.get("exercises").get(i).get("exerciseId").intValue()),
+                        params.get("exercises").get(i).get("reps").asInt(),
+                        params.get("exercises").get(i).get("sets").asInt(),
+                        exerciseRepository.getOne(params.get("exercises").get(i).get("exerciseId").asInt()),
                         wrk
                 ));
             }
@@ -145,7 +145,7 @@ public class WorkoutController {
                 // delete all sets associated to workout
                 setRepository.deleteByWorkoutFk(workoutRepository.findById(ID).get());
 
-                Profile profile = profileRepository.findById(params.get("profileId").intValue()).get();
+                Profile profile = profileRepository.findById(params.get("profileId").asInt()).get();
 
                 Workout wrk = workoutRepository.getOne(ID);
                 wrk.setName(params.get("name").asText());
@@ -156,9 +156,9 @@ public class WorkoutController {
                 // loop through set (exercise) list
                 for (int i = 0; i < params.get("exercises").size(); i++) {
                     setRepository.save(new Set(
-                            params.get("exercises").get(i).get("reps").intValue(),
-                            params.get("exercises").get(i).get("sets").intValue(),
-                            exerciseRepository.getOne(params.get("exercises").get(i).get("exerciseId").intValue()),
+                            params.get("exercises").get(i).get("reps").asInt(),
+                            params.get("exercises").get(i).get("sets").asInt(),
+                            exerciseRepository.getOne(params.get("exercises").get(i).get("exerciseId").asInt()),
                             wrk
                     ));
                 }

@@ -95,7 +95,7 @@ public class ProgramController {
         // name, category, profileId (who creates it), list of workoutId
         HttpHeaders responseHeaders = new HttpHeaders();
         try {
-            Profile profile = profileRepository.findById(params.get("profileId").intValue()).get();
+            Profile profile = profileRepository.findById(params.get("profileId").asInt()).get();
 
             Program program = new Program(
                     params.get("name").asText(),
@@ -107,7 +107,7 @@ public class ProgramController {
             // connect program to workouts by making connection at programWorkout table
             if (params.has("workoutList")) {
                 for (int i = 0; i < params.get("workoutList").size(); i++) {
-                    ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").intValue()).get());
+                    ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").asInt()).get());
                     programWorkoutRepository.save(pw);
                 }
             }
@@ -138,7 +138,7 @@ public class ProgramController {
                 // delete existing workouts
                 programWorkoutRepository.deleteByProgramFk(programRepository.findById(ID).get());
 
-                Profile profile = profileRepository.findById(params.get("profileId").intValue()).get();
+                Profile profile = profileRepository.findById(params.get("profileId").asInt()).get();
 
                 Program program = programRepository.findById(ID).get();
                 program.setName(params.get("name").asText());
@@ -149,7 +149,7 @@ public class ProgramController {
                 // connect program to workouts by making connection at programWorkout table
                 if (params.has("workoutList")) {
                     for (int i = 0; i < params.get("workoutList").size(); i++) {
-                        ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").intValue()).get());
+                        ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").asInt()).get());
                         programWorkoutRepository.save(pw);
                     }
                 }

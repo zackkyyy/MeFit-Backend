@@ -125,17 +125,17 @@ public class GoalsController {
     @PostMapping("/addGoal")
     @Transactional
     public ResponseEntity addGoal(@RequestBody ObjectNode params) throws ParseException {
-        // profileId, achieved, endDate // list workoutId or/and list programId
         HttpHeaders responseHeaders = new HttpHeaders();
         try {
             // check if profile exist
-            if(!profileRepository.existsById(params.get("profileId").intValue())) {
+            if(!profileRepository.existsById(params.get("profileId").asInt())) {
                 return new ResponseEntity(HttpStatus.NOT_FOUND);
             }
-            Profile profile = profileRepository.getOne(params.get("profileId").intValue());
+            Profile profile = profileRepository.getOne(params.get("profileId").asInt());
 
             Goal goal = new Goal(
-                    params.get("achieved").asBoolean(),
+                    false,
+                    new SimpleDateFormat("dd/MM/yyyy").parse(params.get("startDate").asText()),
                     new SimpleDateFormat("dd/MM/yyyy").parse(params.get("endDate").asText()),
                     profile
             );
@@ -143,17 +143,17 @@ public class GoalsController {
 
             // check if there is such element
             // connect workouts to the goal
-            if (params.has("workoutId")) {
-                for (int i = 0; i < params.get("workoutId").size(); i++) {
-                    GoalWorkout gw = new GoalWorkout(false, goal, workoutRepository.findById(params.get("workoutId").get(i).intValue()).get());
+            if (params.has("workoutList")) {
+                for (int i = 0; i < params.get("workoutList").size(); i++) {
+                    GoalWorkout gw = new GoalWorkout(false, goal, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").asInt()).get());
                     goalWorkoutRepository.save(gw);
                 }
             }
             // check if there is such element
             // connect programs to the goal
-            if (params.has("programId")) {
-                for (int i = 0; i < params.get("programId").size(); i++) {
-                    ProgramGoal pg = new ProgramGoal(false, goal, programRepository.findById(params.get("programId").get(i).intValue()).get());
+            if (params.has("programList")) {
+                for (int i = 0; i < params.get("programList").size(); i++) {
+                    ProgramGoal pg = new ProgramGoal(false, goal, programRepository.findById(params.get("programList").get(i).get("programId").asInt()).get());
                     programGoalRepository.save(pg);
 
                     // looping through program workout list to get workout entity
@@ -207,7 +207,7 @@ public class GoalsController {
         *
         * */
         try {
-            Profile profile = profileRepository.findById(params.get("profileId").intValue()).get();
+            Profile profile = profileRepository.findById(params.get("profileId").asInt()).get();
 
             Goal goal = goalRepository.findById(ID).get();
             if(params.has("achieved")) {
@@ -221,7 +221,7 @@ public class GoalsController {
             // check if there is such element
             // update workout of the goal
             if (params.has("workouts")) {
-                Workout workout = workoutRepository.findById(params.get("workouts").get("workoutId").intValue()).get();
+                Workout workout = workoutRepository.findById(params.get("workouts").get("workoutId").asInt()).get();
 
                 GoalWorkout goalW = goalWorkoutRepository.findByGoalFkAndWorkoutFkAndProgramGoalFk(goal, workout, null);
                 goalW.setComplete(params.get("workouts").get("completed").asBoolean());
@@ -231,12 +231,12 @@ public class GoalsController {
             // check if there is such element
             // update program of the goal
             if (params.has("programs")) {
-                ProgramGoal programGoal = programGoalRepository.findTopByProgramFk(programRepository.findById(params.get("programs").get("programId").intValue()).get());
+                ProgramGoal programGoal = programGoalRepository.findTopByProgramFk(programRepository.findById(params.get("programs").get("programId").asInt()).get());
 
                 programGoal.setComplete(params.get("programs").get("completed").asBoolean());
                 programGoalRepository.save(programGoal);
 
-                Workout workout = workoutRepository.findById(params.get("programs").get("workouts").get("workoutId").intValue()).get();
+                Workout workout = workoutRepository.findById(params.get("programs").get("workouts").get("workoutId").asInt()).get();
 
                 GoalWorkout goalW = goalWorkoutRepository.findByProgramGoalFkAndWorkoutFk(programGoal, workout);
                 goalW.setComplete(params.get("programs").get("workouts").get("completed").asBoolean());
