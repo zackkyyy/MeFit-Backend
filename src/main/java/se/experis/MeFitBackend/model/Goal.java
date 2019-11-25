@@ -23,6 +23,9 @@ public class Goal {
     private int goalId;
 
     @Column
+    private String name;
+
+    @Column
     private Boolean achieved;
 
     @Column
@@ -44,7 +47,8 @@ public class Goal {
     @JoinColumn(name="goal_fk")
     private List<ProgramGoal> programGoalFk = new ArrayList<ProgramGoal>();
 
-    public Goal(Boolean achieved, Date startDate, Date endDate, Profile profileFk) {
+    public Goal(String name, Boolean achieved, Date startDate, Date endDate, Profile profileFk) {
+        this.name = name;
         this.achieved = achieved;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -63,6 +67,10 @@ public class Goal {
 
     public int getGoalId() {
         return goalId;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Boolean getAchieved() {
@@ -91,6 +99,10 @@ public class Goal {
 
     public void setGoalId(int goalId) {
         this.goalId = goalId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setAchieved(Boolean achieved) {

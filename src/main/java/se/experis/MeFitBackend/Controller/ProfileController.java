@@ -9,12 +9,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import se.experis.MeFitBackend.model.*;
 import se.experis.MeFitBackend.repositories.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -122,11 +131,6 @@ public class ProfileController {
             if(!prof.getUserId().equals(params.get("userId").asText())) {
                 return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             }
-            prof.setHeight(params.get("height").asInt());
-            prof.setWeight(params.get("weight").asInt());
-            prof.setAge(params.get("age").asInt());
-            prof.setFitnessLevel(params.get("fitnessLevel").asText());
-            profileRepository.save(prof);
 
             Address addr;
             // address row, so retrieve it
@@ -143,6 +147,13 @@ public class ProfileController {
             addr.setCountry(params.get("country").asText());
             addr.setPostalCode(params.get("postalCode").asInt());
             addressRepository.save(addr);
+
+            prof.setHeight(params.get("height").asInt());
+            prof.setWeight(params.get("weight").asInt());
+            prof.setAge(params.get("age").asInt());
+            prof.setFitnessLevel(params.get("fitnessLevel").asText());
+            prof.setAddressFk(addr);
+            profileRepository.save(prof);
 
         } catch (NoSuchElementException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -216,5 +227,31 @@ public class ProfileController {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping(value = "/upload", consumes = "multipart/form-data")
+    public ResponseEntity getFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+        try {
+            String realPathtoUploads =  request.getServletContext().getRealPath("/uploads/");
+            if(! new File(realPathtoUploads).exists()) {
+                new File(realPathtoUploads).mkdir();
+            }
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get(realPathtoUploads + file.getOriginalFilename());
+            System.out.println(path);
+            Files.write(path, bytes);
+
+            Image image = ImageIO.read(new File(path.toString()));
+            if (image == null) {
+                System.out.println("The file could not be opened , it is not an image");
+                return new ResponseEntity("Only images allowed",HttpStatus.BAD_REQUEST);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

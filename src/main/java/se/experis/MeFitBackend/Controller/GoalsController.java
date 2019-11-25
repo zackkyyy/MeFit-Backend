@@ -126,6 +126,7 @@ public class GoalsController {
     @Transactional
     public ResponseEntity addGoal(@RequestBody ObjectNode params) throws ParseException {
         HttpHeaders responseHeaders = new HttpHeaders();
+        System.out.println(params);
         try {
             // check if profile exist
             if(!profileRepository.existsById(params.get("profileId").asInt())) {
@@ -134,6 +135,7 @@ public class GoalsController {
             Profile profile = profileRepository.getOne(params.get("profileId").asInt());
 
             Goal goal = new Goal(
+                    params.get("name").asText(),
                     false,
                     new SimpleDateFormat("dd/MM/yyyy").parse(params.get("startDate").asText()),
                     new SimpleDateFormat("dd/MM/yyyy").parse(params.get("endDate").asText()),
