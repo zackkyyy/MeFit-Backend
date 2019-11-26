@@ -13,6 +13,6 @@ import java.util.List;
  * Project: MeFit-Backend
  */
 
-public interface GoalRepository extends JpaRepository<Goal, Integer> {
+public interface GoalRepository extends JpaRepository<Goal, String> {
     List<Goal> findByProfileFkAndAchieved(Profile profileFk, boolean achieved);
 }

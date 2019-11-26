@@ -1,6 +1,12 @@
 package se.experis.MeFitBackend.Controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.StorageClient;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import org.hibernate.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,14 +24,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.awt.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
 
 /*
     rjanul created on 2019-11-07
@@ -75,7 +85,7 @@ public class ProfileController {
     }
 
     @GetMapping("/profile/{ID}")
-    public ResponseEntity getProfile(@PathVariable int ID){
+    public ResponseEntity getProfile(@PathVariable String ID){
         Profile prof;
         try {
             prof = profileRepository.findById(ID).get();
@@ -124,7 +134,7 @@ public class ProfileController {
     // TODO: check if user is updating his profile and not someone else
     @PatchMapping("/profile/{ID}")
     @Transactional
-    public ResponseEntity patchProfile(@PathVariable int ID, @RequestBody ObjectNode params) {
+    public ResponseEntity patchProfile(@PathVariable String ID, @RequestBody ObjectNode params) {
         try {
             Profile prof = profileRepository.findById(ID).get();
             // user tries to update not his profile
@@ -168,7 +178,7 @@ public class ProfileController {
     // TODO: only admin
     // testing
     @PatchMapping("/profile/role/user/{ID}")
-    public ResponseEntity patchProfileRole(@PathVariable int ID, @RequestBody ObjectNode params) {
+    public ResponseEntity patchProfileRole(@PathVariable String ID, @RequestBody ObjectNode params) {
         try {
             if(params.get("role").asInt() > 3) {
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -192,10 +202,10 @@ public class ProfileController {
     // check if user is contributor
     @DeleteMapping("profile/{ID}")
     @Transactional
-    public ResponseEntity deleteProfile(@PathVariable int ID) {
+    public ResponseEntity deleteProfile(@PathVariable String ID) {
         // if contributor it will change foreign keys for program / workout to null
         try {
-            int addressId = profileRepository.findById(ID).get().getAddressFk().getAddressId();
+            String addressId = profileRepository.findById(ID).get().getAddressFk().getAddressId();
             // If address row is connected to only one row, delete it, otherwise do not
             if(profileRepository.findAllByAddressFk(addressId).size() == 1) {
                 addressRepository.deleteById(addressId);
@@ -232,20 +242,62 @@ public class ProfileController {
     @PostMapping(value = "/upload", consumes = "multipart/form-data")
     public ResponseEntity getFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
         try {
-            String realPathtoUploads =  request.getServletContext().getRealPath("/uploads/");
-            if(! new File(realPathtoUploads).exists()) {
-                new File(realPathtoUploads).mkdir();
-            }
             byte[] bytes = file.getBytes();
-            Path path = Paths.get(realPathtoUploads + file.getOriginalFilename());
-            System.out.println(path);
+            if(! new File("images/").exists() ) {
+                new File("images/").mkdir();
+            }
+            Path path = Paths.get("images/" + file.getOriginalFilename());
             Files.write(path, bytes);
-
+            // Get file to delete later
+            File fileToDelete = new File(path.toString());
+            // check if file is an image
             Image image = ImageIO.read(new File(path.toString()));
             if (image == null) {
-                System.out.println("The file could not be opened , it is not an image");
+                fileToDelete.delete();
                 return new ResponseEntity("Only images allowed",HttpStatus.BAD_REQUEST);
+            } else {
+                // upload to firebase
+                FileInputStream serviceAccount = new FileInputStream("me-fit-49bd9-firebase-adminsdk-jh16u-0177a30c2f.json");
+
+                FirebaseOptions options = new FirebaseOptions.Builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .setDatabaseUrl("https://me-fit-49bd9.firebaseio.com")
+                        .setStorageBucket("me-fit-49bd9.appspot.com")
+                        .build();
+//                if(FirebaseApp.getInstance(FirebaseApp.DEFAULT_APP_NAME) == null) {
+//                    FirebaseApp fireApp = FirebaseApp.initializeApp(options);
+//                }
+
+                if(FirebaseApp.getApps().isEmpty()) { //<--- check with this line
+                    FirebaseApp.initializeApp(options);
+                }
+                FirebaseDatabase databas =  FirebaseDatabase.getInstance();
+                DatabaseReference ref = databas.getReference();
+                ref.setValueAsync("Million reasons");
+
+                System.out.println("getkey: " + ref.push().getKey());
+                System.out.println(ref.push().setValueAsync("million reeasonss !!").get());
+                System.out.println("getkey: " + ref.push().getKey());
+
+
+                StorageClient storageClient = StorageClient.getInstance();
+                InputStream testFile = new FileInputStream(path.toString());
+                String extension = "";
+
+                int i = path.toString().lastIndexOf('.');
+                if (i > 0) {
+                    extension = path.toString().substring(i+1);
+                }
+
+                System.out.println("ext: " + extension);
+                String blobString = "images/exercise/" + "muahazxc";
+                URL urlTest = storageClient.bucket().create(blobString, testFile, "image/" + extension).signUrl(9999, TimeUnit.DAYS);
+
+                System.out.println("test url: " + urlTest);
             }
+
+            // delete image at the end
+            fileToDelete.delete();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {

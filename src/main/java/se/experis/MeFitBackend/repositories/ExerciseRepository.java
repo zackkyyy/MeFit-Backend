@@ -5,6 +5,6 @@ import se.experis.MeFitBackend.model.Exercise;
 
 import java.util.List;
 
-public interface ExerciseRepository extends JpaRepository<Exercise, Integer> {
+public interface ExerciseRepository extends JpaRepository<Exercise, String> {
     List<Exercise> findAllByOrderByTargetMuscleAsc();
 }

@@ -46,7 +46,7 @@ public class GoalsController {
     }
 
     @GetMapping("/goal/{ID}")
-    public ResponseEntity getGoal(@PathVariable int ID){
+    public ResponseEntity getGoal(@PathVariable String ID){
         Goal goal;
         try {
             goal = goalRepository.findById(ID).get();
@@ -59,7 +59,7 @@ public class GoalsController {
     }
 
     @GetMapping("/goal/status/user/{ID}")
-    public ResponseEntity getUnachievedGoals(@PathVariable int ID){
+    public ResponseEntity getUnachievedGoals(@PathVariable String ID){
         List<Goal> gl;
         try {
             gl = goalRepository.findByProfileFkAndAchieved(profileRepository.findById(ID).get(), false);
@@ -75,7 +75,7 @@ public class GoalsController {
     }
 
     @GetMapping("/goal/history/user/{ID}")
-    public ResponseEntity getAchievedGoals(@PathVariable int ID){
+    public ResponseEntity getAchievedGoals(@PathVariable String ID){
         List<Goal> gl;
         try {
             gl = goalRepository.findByProfileFkAndAchieved(profileRepository.findById(ID).get(), true);
@@ -91,7 +91,7 @@ public class GoalsController {
     }
 
     @PatchMapping("/goal/workout/{ID}")
-    public ResponseEntity patchGoalWorkout(@PathVariable int ID){
+    public ResponseEntity patchGoalWorkout(@PathVariable String ID){
         // goalWorkoutId, complete
         GoalWorkout gw;
         try {
@@ -107,7 +107,7 @@ public class GoalsController {
     }
 
     @PatchMapping("/goal/program/{ID}")
-    public ResponseEntity patchGoalProgram(@PathVariable int ID){
+    public ResponseEntity patchGoalProgram(@PathVariable String ID){
         // goalWorkoutId, complete
         ProgramGoal pg;
         try {
@@ -129,10 +129,10 @@ public class GoalsController {
         System.out.println(params);
         try {
             // check if profile exist
-            if(!profileRepository.existsById(params.get("profileId").asInt())) {
+            if(!profileRepository.existsById(params.get("profileId").asText())) {
                 return new ResponseEntity(HttpStatus.NOT_FOUND);
             }
-            Profile profile = profileRepository.getOne(params.get("profileId").asInt());
+            Profile profile = profileRepository.getOne(params.get("profileId").asText());
 
             Goal goal = new Goal(
                     params.get("name").asText(),
@@ -147,7 +147,7 @@ public class GoalsController {
             // connect workouts to the goal
             if (params.has("workoutList")) {
                 for (int i = 0; i < params.get("workoutList").size(); i++) {
-                    GoalWorkout gw = new GoalWorkout(false, goal, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").asInt()).get());
+                    GoalWorkout gw = new GoalWorkout(false, goal, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").asText()).get());
                     goalWorkoutRepository.save(gw);
                 }
             }
@@ -155,7 +155,7 @@ public class GoalsController {
             // connect programs to the goal
             if (params.has("programList")) {
                 for (int i = 0; i < params.get("programList").size(); i++) {
-                    ProgramGoal pg = new ProgramGoal(false, goal, programRepository.findById(params.get("programList").get(i).get("programId").asInt()).get());
+                    ProgramGoal pg = new ProgramGoal(false, goal, programRepository.findById(params.get("programList").get(i).get("programId").asText()).get());
                     programGoalRepository.save(pg);
 
                     // looping through program workout list to get workout entity
@@ -184,7 +184,7 @@ public class GoalsController {
     // TODO: more testing needed
     @PatchMapping("goal/{ID}")
     @Transactional
-    public ResponseEntity patchGoal(@PathVariable int ID, @RequestBody ObjectNode params) {
+    public ResponseEntity patchGoal(@PathVariable String ID, @RequestBody ObjectNode params) {
         /* example data to be received from frontend
         * achieved: "",
         * endDate: "",
@@ -209,7 +209,7 @@ public class GoalsController {
         *
         * */
         try {
-            Profile profile = profileRepository.findById(params.get("profileId").asInt()).get();
+            Profile profile = profileRepository.findById(params.get("profileId").asText()).get();
 
             Goal goal = goalRepository.findById(ID).get();
             if(params.has("achieved")) {
@@ -223,7 +223,7 @@ public class GoalsController {
             // check if there is such element
             // update workout of the goal
             if (params.has("workouts")) {
-                Workout workout = workoutRepository.findById(params.get("workouts").get("workoutId").asInt()).get();
+                Workout workout = workoutRepository.findById(params.get("workouts").get("workoutId").asText()).get();
 
                 GoalWorkout goalW = goalWorkoutRepository.findByGoalFkAndWorkoutFkAndProgramGoalFk(goal, workout, null);
                 goalW.setComplete(params.get("workouts").get("completed").asBoolean());
@@ -233,12 +233,12 @@ public class GoalsController {
             // check if there is such element
             // update program of the goal
             if (params.has("programs")) {
-                ProgramGoal programGoal = programGoalRepository.findTopByProgramFk(programRepository.findById(params.get("programs").get("programId").asInt()).get());
+                ProgramGoal programGoal = programGoalRepository.findTopByProgramFk(programRepository.findById(params.get("programs").get("programId").asText()).get());
 
                 programGoal.setComplete(params.get("programs").get("completed").asBoolean());
                 programGoalRepository.save(programGoal);
 
-                Workout workout = workoutRepository.findById(params.get("programs").get("workouts").get("workoutId").asInt()).get();
+                Workout workout = workoutRepository.findById(params.get("programs").get("workouts").get("workoutId").asText()).get();
 
                 GoalWorkout goalW = goalWorkoutRepository.findByProgramGoalFkAndWorkoutFk(programGoal, workout);
                 goalW.setComplete(params.get("programs").get("workouts").get("completed").asBoolean());
@@ -257,7 +257,7 @@ public class GoalsController {
 
     @DeleteMapping("goal/{ID}")
     @Transactional
-    public ResponseEntity deleteGoal(@PathVariable int ID) {
+    public ResponseEntity deleteGoal(@PathVariable String ID) {
         try {
             goalRepository.deleteById(ID);
         } catch (NoSuchElementException e) {

@@ -13,6 +13,6 @@ import java.util.List;
  * Project: MeFit-Backend
  */
 
-public interface ProgramRepository extends JpaRepository<Program, Integer> {
+public interface ProgramRepository extends JpaRepository<Program, String> {
     List<Program> findAllByProfileFk(Profile profileFk);
 }

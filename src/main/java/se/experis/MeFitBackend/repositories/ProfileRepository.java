@@ -11,7 +11,7 @@ import java.util.List;
  * Project: MeFit-Backend
  */
 
-public interface ProfileRepository extends JpaRepository<Profile, Integer> {
-    List<Profile> findAllByAddressFk(int addressFk);
+public interface ProfileRepository extends JpaRepository<Profile, String> {
+    List<Profile> findAllByAddressFk(String addressFk);
     Profile findByUserId(String userId);
 }

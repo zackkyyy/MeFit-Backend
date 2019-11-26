@@ -45,7 +45,7 @@ public class ProgramController {
     }
 
     @GetMapping("/program/{ID}")
-    public ResponseEntity getProgram(@PathVariable int ID) {
+    public ResponseEntity getProgram(@PathVariable String ID) {
         Program program;
         try {
             program = programRepository.findById(ID).get();
@@ -74,7 +74,7 @@ public class ProgramController {
 
     // returns user's program list
     @GetMapping("/program/user/{ID}")
-    public ResponseEntity getUserProgramList(@PathVariable int ID) {
+    public ResponseEntity getUserProgramList(@PathVariable String ID) {
         List<Program> program;
         try {
             program = programRepository.findAllByProfileFk(profileRepository.findById(ID).get());
@@ -95,7 +95,7 @@ public class ProgramController {
         // name, category, profileId (who creates it), list of workoutId
         HttpHeaders responseHeaders = new HttpHeaders();
         try {
-            Profile profile = profileRepository.findById(params.get("profileId").asInt()).get();
+            Profile profile = profileRepository.findById(params.get("profileId").asText()).get();
 
             Program program = new Program(
                     params.get("name").asText(),
@@ -107,7 +107,7 @@ public class ProgramController {
             // connect program to workouts by making connection at programWorkout table
             if (params.has("workoutList")) {
                 for (int i = 0; i < params.get("workoutList").size(); i++) {
-                    ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").asInt()).get());
+                    ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").asText()).get());
                     programWorkoutRepository.save(pw);
                 }
             }
@@ -129,7 +129,7 @@ public class ProgramController {
     // TODO: Contributor only
     @PatchMapping("program/{ID}")
     @Transactional
-    public ResponseEntity patchProgram(@PathVariable int ID, @RequestBody ObjectNode params) {
+    public ResponseEntity patchProgram(@PathVariable String ID, @RequestBody ObjectNode params) {
         try {
             // check if there is a conflict (there are users using it)
             if(programGoalRepository.findTopByProgramFk(programRepository.findById(ID).get()) != null) {
@@ -138,7 +138,7 @@ public class ProgramController {
                 // delete existing workouts
                 programWorkoutRepository.deleteByProgramFk(programRepository.findById(ID).get());
 
-                Profile profile = profileRepository.findById(params.get("profileId").asInt()).get();
+                Profile profile = profileRepository.findById(params.get("profileId").asText()).get();
 
                 Program program = programRepository.findById(ID).get();
                 program.setName(params.get("name").asText());
@@ -149,7 +149,7 @@ public class ProgramController {
                 // connect program to workouts by making connection at programWorkout table
                 if (params.has("workoutList")) {
                     for (int i = 0; i < params.get("workoutList").size(); i++) {
-                        ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").asInt()).get());
+                        ProgramWorkout pw = new ProgramWorkout(program, workoutRepository.findById(params.get("workoutList").get(i).get("workoutId").asText()).get());
                         programWorkoutRepository.save(pw);
                     }
                 }
@@ -167,7 +167,7 @@ public class ProgramController {
     // TODO: Contributor only
     @DeleteMapping("program/{ID}")
     @Transactional
-    public ResponseEntity deleteProgram(@PathVariable int ID) {
+    public ResponseEntity deleteProgram(@PathVariable String ID) {
         try {
             // check if program is connected to any goals if no delete
             if(programGoalRepository.findTopByProgramFk(programRepository.findById(ID).get()) == null) {

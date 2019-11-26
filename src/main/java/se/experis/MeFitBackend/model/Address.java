@@ -1,6 +1,7 @@
 package se.experis.MeFitBackend.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,8 +18,9 @@ import java.util.List;
 public class Address {
     /** */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int addressId;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String addressId;
 
     @Column
     private String street;
@@ -42,7 +44,7 @@ public class Address {
         this.postalCode = postalCode;
     }
 
-    public Address(int addressId, String street, String city, String country, int postalCode) {
+    public Address(String addressId, String street, String city, String country, int postalCode) {
         this.addressId = addressId;
         this.street = street;
         this.city = city;
@@ -50,7 +52,7 @@ public class Address {
         this.postalCode = postalCode;
     }
 
-    public int getAddressId() {
+    public String getAddressId() {
         return addressId;
     }
 

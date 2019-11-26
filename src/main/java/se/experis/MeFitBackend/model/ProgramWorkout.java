@@ -1,6 +1,7 @@
 package se.experis.MeFitBackend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.persistence.Table;
@@ -15,8 +16,9 @@ import javax.persistence.Table;
 public class ProgramWorkout {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int programWorkoutId;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String programWorkoutId;
 
     @ManyToOne
     @JsonBackReference
@@ -36,7 +38,7 @@ public class ProgramWorkout {
     public ProgramWorkout() {
     }
 
-    public int getProgramWorkoutId() {
+    public String getProgramWorkoutId() {
         return programWorkoutId;
     }
 

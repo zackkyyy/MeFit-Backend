@@ -2,6 +2,7 @@ package se.experis.MeFitBackend.model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -19,8 +20,9 @@ import java.util.List;
 public class Profile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int profileId;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String profileId;
 
     @Column
     private int weight;
@@ -59,7 +61,7 @@ public class Profile {
     public Profile() {
     }
 
-    public Profile(int profileId, int weight, int height, int age, String fitnessLevel) {
+    public Profile(String profileId, int weight, int height, int age, String fitnessLevel) {
         this.profileId = profileId;
         this.weight = weight;
         this.height = height;
@@ -76,7 +78,7 @@ public class Profile {
         this.addressFk = addressFk;
     }
 
-    public int getProfileId() {
+    public String getProfileId() {
         return profileId;
     }
 

@@ -2,6 +2,7 @@ package se.experis.MeFitBackend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -19,8 +20,9 @@ import java.util.List;
 public class Goal {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int goalId;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String goalId;
 
     @Column
     private String name;
@@ -55,7 +57,7 @@ public class Goal {
         this.profileFk = profileFk;
     }
 
-    public Goal(int goalId, Boolean achieved, Date endDate, Profile profileFk) {
+    public Goal(String goalId, Boolean achieved, Date endDate, Profile profileFk) {
         this.goalId = goalId;
         this.achieved = achieved;
         this.endDate = endDate;
@@ -65,7 +67,7 @@ public class Goal {
     public Goal() {
     }
 
-    public int getGoalId() {
+    public String getGoalId() {
         return goalId;
     }
 
@@ -97,7 +99,7 @@ public class Goal {
         return programGoalFk;
     }
 
-    public void setGoalId(int goalId) {
+    public void setGoalId(String goalId) {
         this.goalId = goalId;
     }
 

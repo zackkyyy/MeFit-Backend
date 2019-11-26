@@ -1,5 +1,7 @@
 package se.experis.MeFitBackend.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 
 /**
@@ -13,8 +15,9 @@ import javax.persistence.*;
 public class Exercise {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int exerciseId;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    public String exerciseId;
 
     @Column
     public String name;
@@ -42,7 +45,7 @@ public class Exercise {
         this.videoLink = videoLink;
     }
 
-    public Exercise(int exerciseId, String name, String description, String targetMuscle, String imageLink, String videoLink) {
+    public Exercise(String exerciseId, String name, String description, String targetMuscle, String imageLink, String videoLink) {
         this.exerciseId = exerciseId;
         this.name = name;
         this.description = description;
@@ -51,7 +54,7 @@ public class Exercise {
         this.videoLink = videoLink;
     }
 
-    public int getExerciseId() {
+    public String getExerciseId() {
         return exerciseId;
     }
 

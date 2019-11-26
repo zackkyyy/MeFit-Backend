@@ -7,7 +7,7 @@ import se.experis.MeFitBackend.model.ProgramGoal;
 
 import java.util.List;
 
-public interface ProgramGoalRepository extends JpaRepository<ProgramGoal, Integer> {
+public interface ProgramGoalRepository extends JpaRepository<ProgramGoal, String> {
     ProgramGoal findByProgramFkAndGoalFk(Program programFk, Goal goalFk);
     ProgramGoal findTopByProgramFk(Program programFk);
 }

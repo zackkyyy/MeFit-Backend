@@ -1,6 +1,7 @@
 package se.experis.MeFitBackend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,8 +18,9 @@ import java.util.List;
 public class Program {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int programId;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String programId;
 
     @Column
     private String name;
@@ -49,7 +51,7 @@ public class Program {
     public Program() {
     }
 
-    public int getProgramId() {
+    public String getProgramId() {
         return programId;
     }
 

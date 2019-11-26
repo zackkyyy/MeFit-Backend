@@ -57,15 +57,11 @@ public class ExerciseController {
     }
 
     @GetMapping("/exercises/{ID}")
-    public ResponseEntity getExercise(@PathVariable int ID){
+    public ResponseEntity getExercise(@PathVariable String ID){
         Exercise ex;
         try {
             ex = exerciseRepository.findById(ID).get();
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(ex, HttpStatus.ACCEPTED);
@@ -89,7 +85,7 @@ public class ExerciseController {
 
     // TODO: Contributor only
     @PatchMapping("/exercises/{ID}")
-    public ResponseEntity patchExercise(@PathVariable int ID, @RequestBody Exercise exercise) {
+    public ResponseEntity patchExercise(@PathVariable String ID, @RequestBody Exercise exercise) {
         try {
             // check if exercise exist
             if(!exerciseRepository.existsById(ID)) {
@@ -118,7 +114,7 @@ public class ExerciseController {
     // TODO: Contributor only
     @DeleteMapping("/exercises/{ID}")
     @Transactional
-    public ResponseEntity deleteExercise(@PathVariable int ID) {
+    public ResponseEntity deleteExercise(@PathVariable String ID) {
         try {
             if(setRepository.findTopByExerciseFk(exerciseRepository.findById(ID).get()) == null) {
                 exerciseRepository.deleteById(ID);

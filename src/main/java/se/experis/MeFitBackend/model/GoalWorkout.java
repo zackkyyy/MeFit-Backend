@@ -1,6 +1,7 @@
 package se.experis.MeFitBackend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,8 +17,9 @@ import java.util.List;
 @Table
 public class GoalWorkout {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int goalWorkoutId;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String goalWorkoutId;
 
     @Column
     private boolean complete;
@@ -36,7 +38,7 @@ public class GoalWorkout {
     @JoinColumn(name = "workout_fk")
     private Workout workoutFk;
 
-    public GoalWorkout(int goalWorkoutId, boolean complete, Goal goalFk, ProgramGoal programGoalFk, Workout workoutFk) {
+    public GoalWorkout(String goalWorkoutId, boolean complete, Goal goalFk, ProgramGoal programGoalFk, Workout workoutFk) {
         this.goalWorkoutId = goalWorkoutId;
         this.complete = complete;
         this.goalFk = goalFk;
@@ -51,7 +53,7 @@ public class GoalWorkout {
         this.workoutFk = workoutFk;
     }
 
-    public GoalWorkout(int goalWorkoutId, boolean complete, Goal goalFk, Workout workoutFk) {
+    public GoalWorkout(String goalWorkoutId, boolean complete, Goal goalFk, Workout workoutFk) {
         this.goalWorkoutId = goalWorkoutId;
         this.complete = complete;
         this.goalFk = goalFk;
@@ -77,7 +79,7 @@ public class GoalWorkout {
         return complete;
     }
 
-    public int getGoalWorkoutId() {
+    public String getGoalWorkoutId() {
         return goalWorkoutId;
     }
 

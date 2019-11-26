@@ -47,7 +47,7 @@ public class WorkoutController {
     }
 
     @GetMapping("/workout/{ID}")
-    public ResponseEntity getWorkout(@PathVariable int ID){
+    public ResponseEntity getWorkout(@PathVariable String ID){
         Workout workout;
         try {
             workout = workoutRepository.findById(ID).get();
@@ -77,7 +77,7 @@ public class WorkoutController {
 
     // Returns user's workouts
     @GetMapping("/workout/user/{ID}")
-    public ResponseEntity getUserWorkoutList(@PathVariable int ID){
+    public ResponseEntity getUserWorkoutList(@PathVariable String ID){
         List<Workout> workout;
         try {
             workout = workoutRepository.findAllByProfileFk(profileRepository.findById(ID).get());
@@ -102,7 +102,7 @@ public class WorkoutController {
             wrk = workoutRepository.save(new Workout(
                     params.get("name").asText(),
                     params.get("type").asText(),
-                    profileRepository.findById(params.get("profileId").asInt()).get()
+                    profileRepository.findById(params.get("profileId").asText()).get()
             ));
             workoutRepository.save(wrk);
 
@@ -111,7 +111,7 @@ public class WorkoutController {
                 setRepository.save(new Set(
                         params.get("exercises").get(i).get("reps").asInt(),
                         params.get("exercises").get(i).get("sets").asInt(),
-                        exerciseRepository.getOne(params.get("exercises").get(i).get("exerciseId").asInt()),
+                        exerciseRepository.getOne(params.get("exercises").get(i).get("exerciseId").asText()),
                         wrk
                 ));
             }
@@ -134,7 +134,7 @@ public class WorkoutController {
     // TODO: Contributor only
     @PatchMapping("workout/{ID}")
     @Transactional
-    public ResponseEntity patchWorkout(@PathVariable int ID, @RequestBody ObjectNode params) {
+    public ResponseEntity patchWorkout(@PathVariable String ID, @RequestBody ObjectNode params) {
         try {
             // check if there is a conflict (users using it)
             if(programWorkoutRepository.findTopByWorkoutFk(workoutRepository.findById(ID).get()) != null ||
@@ -145,7 +145,7 @@ public class WorkoutController {
                 // delete all sets associated to workout
                 setRepository.deleteByWorkoutFk(workoutRepository.findById(ID).get());
 
-                Profile profile = profileRepository.findById(params.get("profileId").asInt()).get();
+                Profile profile = profileRepository.findById(params.get("profileId").asText()).get();
 
                 Workout wrk = workoutRepository.getOne(ID);
                 wrk.setName(params.get("name").asText());
@@ -158,7 +158,7 @@ public class WorkoutController {
                     setRepository.save(new Set(
                             params.get("exercises").get(i).get("reps").asInt(),
                             params.get("exercises").get(i).get("sets").asInt(),
-                            exerciseRepository.getOne(params.get("exercises").get(i).get("exerciseId").asInt()),
+                            exerciseRepository.getOne(params.get("exercises").get(i).get("exerciseId").asText()),
                             wrk
                     ));
                 }
@@ -176,7 +176,7 @@ public class WorkoutController {
     // TODO: Contributor only
     @DeleteMapping("workout/{ID}")
     @Transactional
-    public ResponseEntity deleteWorkout(@PathVariable int ID) {
+    public ResponseEntity deleteWorkout(@PathVariable String ID) {
         try {
             // check if there is a conflict (users using it)
             if(programWorkoutRepository.findTopByWorkoutFk(workoutRepository.findById(ID).get()) == null &&

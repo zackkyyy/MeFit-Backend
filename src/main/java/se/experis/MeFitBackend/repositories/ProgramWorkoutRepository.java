@@ -11,7 +11,7 @@ import se.experis.MeFitBackend.model.Workout;
  * Project: MeFit-Backend
  */
 
-public interface ProgramWorkoutRepository extends JpaRepository<ProgramWorkout, Integer> {
+public interface ProgramWorkoutRepository extends JpaRepository<ProgramWorkout, String> {
     Integer deleteByProgramFk(Program programFk);
     ProgramWorkout findTopByWorkoutFk(Workout WorkoutFk);
 }

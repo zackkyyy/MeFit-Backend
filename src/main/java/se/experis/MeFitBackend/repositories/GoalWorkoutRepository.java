@@ -11,7 +11,7 @@ import java.util.List;
  * Project: MeFit-Backend
  */
 
-public interface GoalWorkoutRepository extends JpaRepository<GoalWorkout, Integer> {
+public interface GoalWorkoutRepository extends JpaRepository<GoalWorkout, String> {
     List<GoalWorkout> findAllByGoalFk(Goal goalFk);
     GoalWorkout findByProgramGoalFkAndWorkoutFk(ProgramGoal programGoalFk, Workout workoutFk);
     GoalWorkout findByGoalFkAndWorkoutFkAndProgramGoalFk(Goal goalFk, Workout workoutFk, ProgramGoal programGoalFk);

@@ -11,5 +11,5 @@ import java.util.List;
  * Project: MeFit-Backend
  */
 
-public interface AddressRepository extends JpaRepository<Address, Integer> {
+public interface AddressRepository extends JpaRepository<Address, String> {
 }

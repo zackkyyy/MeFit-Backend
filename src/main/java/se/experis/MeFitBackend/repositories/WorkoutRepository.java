@@ -6,6 +6,6 @@ import se.experis.MeFitBackend.model.Workout;
 
 import java.util.List;
 
-public interface WorkoutRepository extends JpaRepository<Workout, Integer> {
+public interface WorkoutRepository extends JpaRepository<Workout, String> {
     List<Workout> findAllByProfileFk(Profile profileFk);
 }
