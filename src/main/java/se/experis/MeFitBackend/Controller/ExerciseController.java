@@ -94,6 +94,8 @@ public class ExerciseController {
             ex = exerciseRepository.findById(ID).get();
         } catch (IllegalArgumentException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(ex, HttpStatus.ACCEPTED);
     }
@@ -129,8 +131,6 @@ public class ExerciseController {
                 ex.setName(exercise.getName());
                 ex.setDescription(exercise.getDescription());
                 ex.setTargetMuscle(exercise.getTargetMuscle());
-                ex.setImageLink(exercise.getImageLink());
-                ex.setVideoLink(exercise.getVideoLink());
 
                 exerciseRepository.save(ex);
             }

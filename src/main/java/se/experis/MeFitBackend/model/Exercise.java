@@ -32,8 +32,8 @@ public class Exercise {
     @Column(length = 1024)
     public URL imageLink;
 
-    @Column
-    public String videoLink;
+    @Column(length = 1024)
+    public URL videoLink;
 
     public Exercise() {
     }
@@ -44,7 +44,7 @@ public class Exercise {
         this.targetMuscle = targetMuscle;
     }
 
-    public Exercise(String name, String description, String targetMuscle, URL imageLink, String videoLink) {
+    public Exercise(String name, String description, String targetMuscle, URL imageLink, URL videoLink) {
         this.name = name;
         this.description = description;
         this.targetMuscle = targetMuscle;
@@ -52,7 +52,7 @@ public class Exercise {
         this.videoLink = videoLink;
     }
 
-    public Exercise(String exerciseId, String name, String description, String targetMuscle, URL imageLink, String videoLink) {
+    public Exercise(String exerciseId, String name, String description, String targetMuscle, URL imageLink, URL videoLink) {
         this.exerciseId = exerciseId;
         this.name = name;
         this.description = description;
@@ -81,7 +81,7 @@ public class Exercise {
         return imageLink;
     }
 
-    public String getVideoLink() {
+    public URL getVideoLink() {
         return videoLink;
     }
 
@@ -101,7 +101,7 @@ public class Exercise {
         this.imageLink = imageLink;
     }
 
-    public void setVideoLink(String videoLink) {
+    public void setVideoLink(URL videoLink) {
         this.videoLink = videoLink;
     }
 }
