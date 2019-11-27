@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,24 +39,26 @@ public class Profile {
 
     @Column
     private int role;
+    @Column(length = 1024)
+    private URL profileImage;
 
-    @Column(unique=true, nullable=false)
+    @Column(unique = true, nullable = false)
     private String userId;
 
-    @OneToMany(orphanRemoval=true)
-    @JoinColumn(name="profile_fk")
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "profile_fk")
     private List<Goal> goalFk = new ArrayList<Goal>();
 
     @OneToMany
-    @JoinColumn(name="profile_fk")
+    @JoinColumn(name = "profile_fk")
     private List<Program> programFk = new ArrayList<Program>();
 
     @OneToMany
-    @JoinColumn(name="profile_fk")
+    @JoinColumn(name = "profile_fk")
     private List<Workout> workoutFk = new ArrayList<Workout>();
 
     @OneToOne
-    @JoinColumn(name="address_fk")
+    @JoinColumn(name = "address_fk")
     private Address addressFk;
 
     public Profile() {
@@ -98,16 +101,16 @@ public class Profile {
         return fitnessLevel;
     }
 
+    public int getRole() {
+        return role;
+    }
+
+    public URL getProfileImage() {
+        return profileImage;
+    }
+
     public String getUserId() {
         return userId;
-    }
-
-    public Address getAddressFk() {
-        return addressFk;
-    }
-
-    public List<Workout> getWorkoutFk() {
-        return workoutFk;
     }
 
     public List<Goal> getGoalFk() {
@@ -116,6 +119,14 @@ public class Profile {
 
     public List<Program> getProgramFk() {
         return programFk;
+    }
+
+    public List<Workout> getWorkoutFk() {
+        return workoutFk;
+    }
+
+    public Address getAddressFk() {
+        return addressFk;
     }
 
     public void setWeight(int weight) {
@@ -134,19 +145,19 @@ public class Profile {
         this.fitnessLevel = fitnessLevel;
     }
 
+    public void setRole(int role) {
+        this.role = role;
+    }
+
+    public void setProfileImage(URL profileImage) {
+        this.profileImage = profileImage;
+    }
+
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
     public void setAddressFk(Address addressFk) {
         this.addressFk = addressFk;
-    }
-
-    public int getRole() {
-        return role;
-    }
-
-    public void setRole(int role) {
-        this.role = role;
     }
 }

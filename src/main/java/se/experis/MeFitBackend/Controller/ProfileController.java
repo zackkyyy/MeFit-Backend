@@ -8,6 +8,7 @@ import com.google.firebase.cloud.StorageClient;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import org.hibernate.MappingException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import se.experis.MeFitBackend.model.*;
 import se.experis.MeFitBackend.repositories.*;
+import se.experis.MeFitBackend.util.ImageUpload;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -239,71 +241,33 @@ public class ProfileController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping(value = "/upload", consumes = "multipart/form-data")
-    public ResponseEntity getFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+    @PatchMapping(value = "/profile/{ID}/image", consumes = "multipart/form-data")
+    public ResponseEntity getFile(@RequestParam("file") MultipartFile file, @PathVariable String ID) {
         try {
-            byte[] bytes = file.getBytes();
-            if(! new File("images/").exists() ) {
-                new File("images/").mkdir();
-            }
             Path path = Paths.get("images/" + file.getOriginalFilename());
-            Files.write(path, bytes);
-            // Get file to delete later
-            File fileToDelete = new File(path.toString());
-            // check if file is an image
-            Image image = ImageIO.read(new File(path.toString()));
-            if (image == null) {
-                fileToDelete.delete();
-                return new ResponseEntity("Only images allowed",HttpStatus.BAD_REQUEST);
-            } else {
+            // save file and check if file is valid otherwise delete
+
+            if (ImageUpload.isFileValid(file, path)) {
                 // upload to firebase
-                FileInputStream serviceAccount = new FileInputStream("me-fit-49bd9-firebase-adminsdk-jh16u-0177a30c2f.json");
+                Profile prof = profileRepository.getOne(ID);
+                URL imageUrl = ImageUpload.uploadToCloud("images/profile/", prof.getProfileId(), path);
 
-                FirebaseOptions options = new FirebaseOptions.Builder()
-                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                        .setDatabaseUrl("https://me-fit-49bd9.firebaseio.com")
-                        .setStorageBucket("me-fit-49bd9.appspot.com")
-                        .build();
-//                if(FirebaseApp.getInstance(FirebaseApp.DEFAULT_APP_NAME) == null) {
-//                    FirebaseApp fireApp = FirebaseApp.initializeApp(options);
-//                }
+                // update exercise with new image link
+                prof.setProfileImage(imageUrl);
+                profileRepository.save(prof);
 
-                if(FirebaseApp.getApps().isEmpty()) { //<--- check with this line
-                    FirebaseApp.initializeApp(options);
-                }
-                FirebaseDatabase databas =  FirebaseDatabase.getInstance();
-                DatabaseReference ref = databas.getReference();
-                ref.setValueAsync("Million reasons");
+                File fileToDelete = new File(path.toString());
+                fileToDelete.delete();
 
-                System.out.println("getkey: " + ref.push().getKey());
-                System.out.println(ref.push().setValueAsync("million reeasonss !!").get());
-                System.out.println("getkey: " + ref.push().getKey());
-
-
-                StorageClient storageClient = StorageClient.getInstance();
-                InputStream testFile = new FileInputStream(path.toString());
-                String extension = "";
-
-                int i = path.toString().lastIndexOf('.');
-                if (i > 0) {
-                    extension = path.toString().substring(i+1);
-                }
-
-                System.out.println("ext: " + extension);
-                String blobString = "images/exercise/" + "muahazxc";
-                URL urlTest = storageClient.bucket().create(blobString, testFile, "image/" + extension).signUrl(9999, TimeUnit.DAYS);
-
-                System.out.println("test url: " + urlTest);
+            } else {
+                return new ResponseEntity("Only images allowed", HttpStatus.BAD_REQUEST);
             }
-
-            // delete image at the end
-            fileToDelete.delete();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

@@ -3,6 +3,7 @@ package se.experis.MeFitBackend.model;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.net.URL;
 
 /**
  * Author : Zacky Kharboutli
@@ -28,8 +29,8 @@ public class Exercise {
     @Column
     public String targetMuscle;
 
-    @Column
-    public String imageLink;
+    @Column(length = 1024)
+    public URL imageLink;
 
     @Column
     public String videoLink;
@@ -37,7 +38,13 @@ public class Exercise {
     public Exercise() {
     }
 
-    public Exercise(String name, String description, String targetMuscle, String imageLink, String videoLink) {
+    public Exercise(String name, String description, String targetMuscle) {
+        this.name = name;
+        this.description = description;
+        this.targetMuscle = targetMuscle;
+    }
+
+    public Exercise(String name, String description, String targetMuscle, URL imageLink, String videoLink) {
         this.name = name;
         this.description = description;
         this.targetMuscle = targetMuscle;
@@ -45,7 +52,7 @@ public class Exercise {
         this.videoLink = videoLink;
     }
 
-    public Exercise(String exerciseId, String name, String description, String targetMuscle, String imageLink, String videoLink) {
+    public Exercise(String exerciseId, String name, String description, String targetMuscle, URL imageLink, String videoLink) {
         this.exerciseId = exerciseId;
         this.name = name;
         this.description = description;
@@ -70,7 +77,7 @@ public class Exercise {
         return targetMuscle;
     }
 
-    public String getImageLink() {
+    public URL getImageLink() {
         return imageLink;
     }
 
@@ -90,7 +97,7 @@ public class Exercise {
         this.targetMuscle = targetMuscle;
     }
 
-    public void setImageLink(String imageLink) {
+    public void setImageLink(URL imageLink) {
         this.imageLink = imageLink;
     }
 

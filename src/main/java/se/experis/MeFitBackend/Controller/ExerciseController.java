@@ -1,6 +1,6 @@
 package se.experis.MeFitBackend.Controller;
 
-import org.hibernate.MappingException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -8,16 +8,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import se.experis.MeFitBackend.model.Exercise;
-import se.experis.MeFitBackend.model.Set;
+import se.experis.MeFitBackend.util.ImageUpload;
 import se.experis.MeFitBackend.repositories.ExerciseRepository;
 import se.experis.MeFitBackend.repositories.SetRepository;
 
 import javax.transaction.Transactional;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 
 /*
     rjanul created on 2019-11-07
@@ -38,19 +44,44 @@ public class ExerciseController {
     }
 
     // TODO: Contributor only
-    @PostMapping("/addExercise")
-    public ResponseEntity addExercise(@RequestBody Exercise exercise){
+    @PostMapping(value = "/addExercise", consumes = "multipart/form-data")
+    @Transactional
+    public ResponseEntity addExercise(@RequestParam("file") MultipartFile file, @RequestParam("exercise") String exercise){
         HttpHeaders responseHeaders = new HttpHeaders();
-
+        JSONObject exerciseObj = new JSONObject(exercise);
         try {
-            Exercise ex = exerciseRepository.save(exercise);
+            Path path = Paths.get("images/" + file.getOriginalFilename());
+            // save file and check if file is valid otherwise delete
 
-            responseHeaders.setLocation(new URI(rootURL + "exercises/" + ex.getExerciseId()));
-        } catch (MappingException e) {
+            if (ImageUpload.isFileValid(file, path)) {
+                // save exercise
+                Exercise ex = exerciseRepository.save(new Exercise(
+                        exerciseObj.getString("name"),
+                        exerciseObj.getString("description"),
+                        exerciseObj.getString("targetMuscle")
+                ));
+                // upload to firebase
+                URL imageUrl = ImageUpload.uploadToCloud("images/exercise/", ex.getExerciseId(), path);
+
+                // update exercise with new image link
+                ex.setImageLink(imageUrl);
+                exerciseRepository.save(ex);
+
+                File fileToDelete = new File(path.toString());
+                fileToDelete.delete();
+
+                responseHeaders.setLocation(new URI(rootURL + "exercises/" + ex.getExerciseId()));
+            } else {
+                return new ResponseEntity("Only images allowed", HttpStatus.BAD_REQUEST);
+            }
+        } catch (IOException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (URISyntaxException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(responseHeaders, HttpStatus.CREATED);
