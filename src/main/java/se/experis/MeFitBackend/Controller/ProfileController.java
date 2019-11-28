@@ -1,14 +1,7 @@
 package se.experis.MeFitBackend.Controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.cloud.StorageClient;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import org.hibernate.MappingException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -21,23 +14,16 @@ import se.experis.MeFitBackend.model.*;
 import se.experis.MeFitBackend.repositories.*;
 import se.experis.MeFitBackend.util.ImageUpload;
 
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.awt.*;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.concurrent.TimeUnit;
 
 /*
     rjanul created on 2019-11-07
@@ -96,7 +82,7 @@ public class ProfileController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(prof, HttpStatus.ACCEPTED);
     }
@@ -264,8 +250,9 @@ public class ProfileController {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            e.printStackTrace();
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.NO_CONTENT);

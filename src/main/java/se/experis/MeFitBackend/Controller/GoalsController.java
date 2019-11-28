@@ -103,7 +103,7 @@ public class GoalsController {
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(HttpStatus.ACCEPTED);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/goal/program/{ID}")
@@ -119,7 +119,7 @@ public class GoalsController {
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(HttpStatus.ACCEPTED);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/addGoal")
@@ -160,7 +160,7 @@ public class GoalsController {
 
                     // looping through program workout list to get workout entity
                     for (int j = 0; j <pg.getProgramFk().getProgramWorkoutFk().size() ; j++) {
-                        GoalWorkout gw = new GoalWorkout(false, pg, pg.getProgramFk().getProgramWorkoutFk().get(i).getWorkoutFk());
+                        GoalWorkout gw = new GoalWorkout(false, pg, pg.getProgramFk().getProgramWorkoutFk().get(j).getWorkoutFk());
                         goalWorkoutRepository.save(gw);
                     }
                 }

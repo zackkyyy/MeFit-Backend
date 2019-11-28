@@ -106,8 +106,6 @@ public class ExerciseController {
         List<Exercise> ex;
         try {
             ex = exerciseRepository.findAllByOrderByTargetMuscleAsc();
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

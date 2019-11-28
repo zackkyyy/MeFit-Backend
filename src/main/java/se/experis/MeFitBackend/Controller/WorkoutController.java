@@ -65,8 +65,6 @@ public class WorkoutController {
         List<Workout> workout;
         try {
             workout = workoutRepository.findAll();
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
