@@ -56,6 +56,7 @@ public class ProfileController {
             Profile profile = new Profile();
             profile.setUserId(params.get("userId").asText());
             profile.setRole(1);
+            profile.setFitnessLevel("Newbie");
             profileRepository.save(profile);
 
             responseHeaders.setLocation(new URI(rootURL + "profile/" + profile.getProfileId()));
